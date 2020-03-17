@@ -75,7 +75,6 @@ RUN mkdir -p ${CODE_BUILTIN_EXTENSIONS_DIR} \
   && cd /
 
 ENV PATH=/opt/code-server:$PATH
-COPY vsix/* /var/tmp/
 
 ## Install JupyterLab
 RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
@@ -170,6 +169,7 @@ RUN mkdir -p .local/share/code-server/User \
 COPY *.sh /usr/local/bin/
 COPY jupyter_notebook_config.py /etc/jupyter/
 COPY startup.jl ${JULIA_PATH}/etc/julia/startup.jl
+COPY vsix/* /var/tmp/
 COPY --chown=$NB_UID:$NB_GID .p10k.zsh.sample .
 
 EXPOSE 8888
