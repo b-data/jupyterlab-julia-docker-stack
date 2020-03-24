@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/julia/ver:1.3.1
+FROM registry.gitlab.b-data.ch/julia/ver:1.4.0
 
 LABEL org.label-schema.license="MIT" \
       org.label-schema.vcs-url="https://gitlab.b-data.ch/jupyterlab/julia/docker-stack" \

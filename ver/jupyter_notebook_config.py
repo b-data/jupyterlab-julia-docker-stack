@@ -9,7 +9,7 @@ import stat
 import shutil
 
 c = get_config()
-c.KernelSpecManager.whitelist=["julia-1.3"]
+c.KernelSpecManager.whitelist=["julia-1.4"]
 c.NotebookApp.ip = '0.0.0.0'
 c.NotebookApp.port = 8888
 c.NotebookApp.open_browser = False
