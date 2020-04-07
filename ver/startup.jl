@@ -6,4 +6,3 @@ println("Executing site-specific startup file (", @__FILE__, ")...")
 push!(LOAD_PATH, "$(ENV["JULIA_PATH"])/local/share/julia/environments/v$(VERSION.major).$(VERSION.minor)")
 
 using Pkg
-Pkg.activate("$(ENV["HOME"])/.julia/environments/v$(VERSION.major).$(VERSION.minor)")

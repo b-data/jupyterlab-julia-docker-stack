@@ -24,7 +24,7 @@ if [[ ! -f ".julia/config/startup_ijulia.jl" ]]; then
   .julia/config/startup_ijulia.jl
 fi
 if [[ ! -f ".julia/config/startup.jl" ]]; then
-  echo -e 'println("Executing user-specific startup file (", @__FILE__, ")...")\n\natreplinit() do repl\n    try\n        @eval using Revise\n        @async Revise.wait_steal_repl_backend()\n        println("Revise started")\n    catch\n        @warn("Could not load Revise")\n    end\nend' > \
+  echo -e 'println("Executing user-specific startup file (", @__FILE__, ")...")\n\natreplinit() do repl\n    try\n        @eval using Revise\n        @async Revise.wait_steal_repl_backend()\n        println("Revise started")\n    catch\n        @warn("Could not load Revise")\n    end\n    Pkg.activate("$(ENV["HOME"])/.julia/environments/v$(VERSION.major).$(VERSION.minor)")\nend' > \
   .julia/config/startup.jl
 fi
 
