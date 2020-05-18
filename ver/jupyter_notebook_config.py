@@ -9,10 +9,8 @@ import stat
 import shutil
 
 c = get_config()
-c.KernelSpecManager.whitelist=["julia-1.3"]
 c.NotebookApp.ip = '0.0.0.0'
 c.NotebookApp.port = 8888
-c.NotebookApp.open_browser = False
 
 # https://github.com/jupyter/notebook/issues/3130
 c.FileContentsManager.delete_to_trash = False

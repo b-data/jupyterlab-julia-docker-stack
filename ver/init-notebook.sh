@@ -5,11 +5,11 @@
 set -e
 
 # Install Code Server extension for Julia Language Supprt
-if [[ $(find .local/share/code-server/extensions -type d -name "julialang.language-julia-0.14.17" | wc -l) != "0" ]]; then
-  rm -r .local/share/code-server/extensions/julialang.language-julia-0.14.17
+if [[ $(find .local/share/code-server/extensions -type d -name "julialang.language-julia-0.14.18" | wc -l) != "0" ]]; then
+  rm -r .local/share/code-server/extensions/julialang.language-julia-0.14.18
 fi
-if [[ ! -d ".local/share/code-server/extensions/julialang.language-julia-0.14.18" ]]; then
-  code-server --install-extension /var/tmp/julialang.language-julia-0.14.18.vsix
+if [[ ! -d ".local/share/code-server/extensions/julialang.language-julia-0.15.18" ]]; then
+  code-server --install-extension /var/tmp/julialang.language-julia-0.15.18.vsix
 fi
 
 # Clone JuliaBoxTutorials
@@ -24,7 +24,7 @@ if [[ ! -f ".julia/config/startup_ijulia.jl" ]]; then
   .julia/config/startup_ijulia.jl
 fi
 if [[ ! -f ".julia/config/startup.jl" ]]; then
-  echo -e 'println("Executing user-specific startup file (", @__FILE__, ")...")\n\natreplinit() do repl\n    try\n        @eval using Revise\n        @async Revise.wait_steal_repl_backend()\n        println("Revise started")\n    catch\n        @warn("Could not load Revise")\n    end\nend' > \
+  echo -e 'println("Executing user-specific startup file (", @__FILE__, ")...")\n\natreplinit() do repl\n    try\n        @eval using Revise\n        @async Revise.wait_steal_repl_backend()\n        println("Revise started")\n    catch\n        @warn("Could not load Revise")\n    end\n    Pkg.activate("$(ENV["HOME"])/.julia/environments/v$(VERSION.major).$(VERSION.minor)")\nend' > \
   .julia/config/startup.jl
 fi
 
