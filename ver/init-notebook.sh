@@ -5,11 +5,11 @@
 set -e
 
 # Install Code Server extension for Julia Language Supprt
-if [[ $(find .local/share/code-server/extensions -type d -name "julialang.language-julia-0.14.18" | wc -l) != "0" ]]; then
-  rm -r .local/share/code-server/extensions/julialang.language-julia-0.14.18
+if [[ $(find .local/share/code-server/extensions -type d -name "julialang.language-julia-0.15.18" | wc -l) != "0" ]]; then
+  rm -r .local/share/code-server/extensions/julialang.language-julia-0.15.18
 fi
-if [[ ! -d ".local/share/code-server/extensions/julialang.language-julia-0.15.18" ]]; then
-  code-server --install-extension /var/tmp/julialang.language-julia-0.15.18.vsix
+if [[ ! -d ".local/share/code-server/extensions/julialang.language-julia-0.15.25" ]]; then
+  code-server --install-extension /var/tmp/julialang.language-julia-0.15.25.vsix
 fi
 
 # Clone JuliaBoxTutorials

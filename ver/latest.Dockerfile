@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/julia/ver:1.4.0
+FROM registry.gitlab.b-data.ch/julia/ver:1.4.1
 
 LABEL org.label-schema.license="MIT" \
       org.label-schema.vcs-url="https://gitlab.b-data.ch/jupyterlab/julia/docker-stack" \
@@ -18,7 +18,7 @@ ENV NB_USER=${NB_USER:-jovyan} \
     NB_GID=${NB_GID:-100} \
     JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.0.0} \
     JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-1.2.6} \
-    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.1.0} \
+    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.2.0} \
     CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
     PANDOC_VERSION=${PANDOC_VERSION:-2.9}
 
