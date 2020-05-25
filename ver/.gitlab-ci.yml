@@ -24,16 +24,16 @@ build-latest:
     - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ_MIN
     - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ
   rules:
-    - if: $CI_COMMIT_BRANCH == 'master'
+    - if: $CI_COMMIT_REF_NAME == "master"
       changes:
         - ver/latest.Dockerfile
 
 build-version:
   stage: build
   script:
-    - cd ver && docker build --pull -t $CI_REGISTRY_IMAGE:1.4.0 -f 1.4.0.Dockerfile .
-    - docker push $CI_REGISTRY_IMAGE:1.4.0
+    - cd ver && docker build --pull -t $CI_REGISTRY_IMAGE:1.4.1 -f 1.4.1.Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE:1.4.1
   rules:
-    - if: $CI_COMMIT_BRANCH == 'freeze-version'
+    - if: $CI_COMMIT_REF_NAME == "freeze-version"
       changes:
-        - ver/1.4.0.Dockerfile
+        - ver/1.4.1.Dockerfile
