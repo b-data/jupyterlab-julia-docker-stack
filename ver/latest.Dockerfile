@@ -77,6 +77,7 @@ RUN mkdir -p ${CODE_BUILTIN_EXTENSIONS_DIR} \
   && cd /
 
 ENV PATH=/opt/code-server/bin:$PATH
+COPY vsix/tmp/* /tmp/
 
 ## Install JupyterLab
 RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
@@ -115,11 +116,7 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && echo '{\n  "@jupyterlab/apputils-extension:themes": {\n    "theme": "JupyterLab Dark"\n  }\n}' > /usr/local/share/jupyter/lab/settings/overrides.json \
   ## Install code-server extensions
   && cd /tmp \
-  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/alefragnani/vsextensions/project-manager/11.0.1/vspackage -o alefragnani.project-manager-11.0.1.vsix.gz \
-  && gunzip alefragnani.project-manager-11.0.1.vsix.gz \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-11.0.1.vsix \
-  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/fabiospampinato/vsextensions/vscode-terminals/1.12.9/vspackage -o fabiospampinato.vscode-terminals-1.12.9.vsix.gz \
-  && gunzip fabiospampinato.vscode-terminals-1.12.9.vsix.gz \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension fabiospampinato.vscode-terminals-1.12.9.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
@@ -177,7 +174,7 @@ RUN mkdir -p .local/share/code-server/User \
 COPY *.sh /usr/local/bin/
 COPY jupyter_notebook_config.py /etc/jupyter/
 COPY startup.jl ${JULIA_PATH}/etc/julia/startup.jl
-COPY vsix/* /var/tmp/
+COPY vsix/var/tmp/* /var/tmp/
 COPY --chown=$NB_UID:$NB_GID .p10k.zsh.sample .
 
 EXPOSE 8888
