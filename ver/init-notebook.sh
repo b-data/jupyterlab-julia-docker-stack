@@ -9,7 +9,8 @@ if [[ $(find .local/share/code-server/extensions -type d -name "julialang.langua
   rm -r .local/share/code-server/extensions/julialang.language-julia-0.15.25
 fi
 if [[ ! -d ".local/share/code-server/extensions/julialang.language-julia-0.15.32" ]]; then
-  code-server --install-extension /var/tmp/julialang.language-julia-0.15.32.vsix
+  code-server --extensions-dir ~/.local/share/code-server/extensions \
+    --install-extension /var/tmp/julialang.language-julia-0.15.32.vsix
 fi
 
 # Clone JuliaBoxTutorials
