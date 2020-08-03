@@ -5,12 +5,11 @@
 set -e
 
 # Install Code Server extension for Julia Language Supprt
-if [[ $(find .local/share/code-server/extensions -type d -name "julialang.language-julia-0.15.25" | wc -l) != "0" ]]; then
-  rm -r .local/share/code-server/extensions/julialang.language-julia-0.15.25
+if [[ $(find .local/share/code-server/extensions -type d -name "julialang.language-julia-0.16.7" | wc -l) != "0" ]]; then
+  rm -r .local/share/code-server/extensions/julialang.language-julia-0.16.7
 fi
-if [[ ! -d ".local/share/code-server/extensions/julialang.language-julia-0.15.32" ]]; then
-  code-server --extensions-dir ~/.local/share/code-server/extensions \
-    --install-extension /var/tmp/julialang.language-julia-0.15.32.vsix
+if [[ ! -d ".local/share/code-server/extensions/julialang.language-julia-0.16.11.vsix" ]]; then
+  code-server --install-extension /var/tmp/julialang.language-julia-0.16.11.vsix
 fi
 
 # Clone JuliaBoxTutorials
@@ -36,5 +35,8 @@ sed -i ':a;N;$!ba;s/,\n\}/\n}/g' .local/share/code-server/User/settings.json.bak
 jq -s '.[0] * .[1]' /var/tmp/settings.json \
   .local/share/code-server/User/settings.json.bak > \
   .local/share/code-server/User/settings.json
+
+# Remove old .zcompdump files
+rm -f .zcompdump*
 
 exec /usr/local/bin/start-notebook.sh "$@"
