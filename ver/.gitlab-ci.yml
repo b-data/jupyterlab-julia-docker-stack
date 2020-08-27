@@ -32,9 +32,7 @@ build-version:
   stage: build
   script:
     - cd ver && docker build --pull -t $CI_REGISTRY_IMAGE:1.4.2 -f 1.4.2.Dockerfile .
-    - docker tag $CI_REGISTRY_IMAGE:1.4.2 $CI_REGISTRY_IMAGE:1.4
     - docker push $CI_REGISTRY_IMAGE:1.4.2
-    - docker push $CI_REGISTRY_IMAGE:1.4
   rules:
     - if: $CI_COMMIT_REF_NAME == "freeze-version"
       changes:

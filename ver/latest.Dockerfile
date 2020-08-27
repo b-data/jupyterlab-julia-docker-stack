@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/julia/ver:1.4.2
+FROM registry.gitlab.b-data.ch/julia/ver:1.5.0
 
 LABEL org.label-schema.license="MIT" \
       org.label-schema.vcs-url="https://gitlab.b-data.ch/jupyterlab/julia/docker-stack" \
@@ -143,7 +143,7 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
 ## Install the Julia kernel for JupyterLab
 RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
   && julia -e "using Pkg; pkg\"add IJulia Revise\"; pkg\"precompile\"" \
-  && chmod -R ugo+r ${JULIA_DEPOT_PATH} \
+  && chmod -R ugo+rx ${JULIA_DEPOT_PATH} \
   && unset JULIA_DEPOT_PATH \
   && mv $HOME/.local/share/jupyter/kernels/julia* /usr/local/share/jupyter/kernels/ \
   && rm -rf $HOME/.local
