@@ -163,7 +163,7 @@ ENV HOME=/home/${NB_USER} \
 WORKDIR ${HOME}
 
 RUN mkdir -p .local/share/code-server/User \
-  && && echo '{\n    "editor.tabSize": 2,\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "julia.enableCrashReporter": false,\n    "julia.enableTelemetry": false,\n    "julia.format.indent": 2,\n    "python.dataScience.jupyterServerURI": "http://localhost:8888${env:JUPYTERHUB_SERVICE_PREFIX}?token=${env:JUPYTERHUB_API_TOKEN}",\n    "python.pythonPath": "/usr/bin/python3",\n    "workbench.colorTheme": "Default Dark+"\n}' > .local/share/code-server/User/settings.json \
+  && echo '{\n    "editor.tabSize": 2,\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "julia.enableCrashReporter": false,\n    "julia.enableTelemetry": false,\n    "julia.format.indent": 2,\n    "python.dataScience.jupyterServerURI": "http://localhost:8888${env:JUPYTERHUB_SERVICE_PREFIX}?token=${env:JUPYTERHUB_API_TOKEN}",\n    "python.pythonPath": "/usr/bin/python3",\n    "workbench.colorTheme": "Default Dark+"\n}' > .local/share/code-server/User/settings.json \
   && cp .local/share/code-server/User/settings.json /var/tmp \
   && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended \
   && git clone --depth=1 https://github.com/romkatv/powerlevel10k.git .oh-my-zsh/custom/themes/powerlevel10k \
