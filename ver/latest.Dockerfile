@@ -127,6 +127,7 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
   && cd /var/tmp/ \
   && curl -sLO https://dl.b-data.ch/vsix/julialang.language-julia-1.0.7.vsix \
+  && mkdir -p /usr/local/bin/before-notebook.d \
   && cd / \
   ## Clean up (Node.js)
   && rm -rf /tmp/* \
@@ -167,6 +168,7 @@ RUN mkdir -p .local/share/code-server/User \
   && cp .local/share/code-server/User/settings.json /var/tmp \
   && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended \
   && git clone --depth=1 https://github.com/romkatv/powerlevel10k.git .oh-my-zsh/custom/themes/powerlevel10k \
+  && sed -i 's/ZSH="\/home\/jovyan\/.oh-my-zsh"/ZSH="$HOME\/.oh-my-zsh"/g' .zshrc \
   #&& sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="powerlevel10k\/powerlevel10k"/g' .zshrc \
   && echo "\n# set PATH so it includes user's private bin if it exists\nif [ -d "\$HOME/bin" ] ; then\n    PATH="\$HOME/bin:\$PATH"\nfi" | tee -a .bashrc .zshrc \
   && echo "\n# set PATH so it includes user's private bin if it exists\nif [ -d "\$HOME/.local/bin" ] ; then\n    PATH="\$HOME/.local/bin:\$PATH"\nfi" | tee -a .bashrc .zshrc \
@@ -174,7 +176,8 @@ RUN mkdir -p .local/share/code-server/User \
   && echo "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh" >> .zshrc
 
 ## Copy local files as late as possible to avoid cache busting
-COPY *.sh /usr/local/bin/
+COPY start*.sh /usr/local/bin/
+COPY init.sh /usr/local/bin//before-notebook.d/
 COPY jupyter_notebook_config.py /etc/jupyter/
 COPY startup.jl ${JULIA_PATH}/etc/julia/startup.jl
 COPY --chown=$NB_UID:$NB_GID .p10k.zsh.sample .
@@ -183,4 +186,4 @@ EXPOSE 8888
 
 ## Configure container startup
 ENTRYPOINT ["tini", "-g", "--"]
-CMD ["init-notebook.sh"]
+CMD ["start-notebook.sh"]
