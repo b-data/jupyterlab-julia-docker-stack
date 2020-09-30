@@ -30,11 +30,11 @@ if [ $(id -u) == 0 ] ; then
     fi
 
     # Update Code Server settings
-    su - $NB_USER -c "mv .local/share/code-server/User/settings.json \
+    su $NB_USER -c "mv .local/share/code-server/User/settings.json \
       .local/share/code-server/User/settings.json.bak"
-    su - $NB_USER -c "sed -i ':a;N;$!ba;s/,\n\}/\n}/g' \
+    su $NB_USER -c "sed -i ':a;N;$!ba;s/,\n\}/\n}/g' \
       .local/share/code-server/User/settings.json.bak"
-    su - $NB_USER -c "jq -s '.[0] * .[1]' /var/tmp/settings.json \
+    su $NB_USER -c "jq -s '.[0] * .[1]' /var/tmp/settings.json \
       .local/share/code-server/User/settings.json.bak > \
       .local/share/code-server/User/settings.json"
 else
