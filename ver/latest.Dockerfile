@@ -127,6 +127,7 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
   && cd /var/tmp/ \
   && curl -sLO https://dl.b-data.ch/vsix/julialang.language-julia-1.0.7.vsix \
+  && mkdir -p /usr/local/bin/start-notebook.d \
   && mkdir -p /usr/local/bin/before-notebook.d \
   && cd / \
   ## Clean up (Node.js)
@@ -173,14 +174,15 @@ RUN mkdir -p .local/share/code-server/User \
   && echo "\n# set PATH so it includes user's private bin if it exists\nif [ -d "\$HOME/bin" ] ; then\n    PATH="\$HOME/bin:\$PATH"\nfi" | tee -a .bashrc .zshrc \
   && echo "\n# set PATH so it includes user's private bin if it exists\nif [ -d "\$HOME/.local/bin" ] ; then\n    PATH="\$HOME/.local/bin:\$PATH"\nfi" | tee -a .bashrc .zshrc \
   && echo "\n# To customize prompt, run \`p10k configure\` or edit ~/.p10k.zsh." >> .zshrc \
-  && echo "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh" >> .zshrc
+  && echo "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh" >> .zshrc \
+  && cp -a $HOME /var/tmp
 
 ## Copy local files as late as possible to avoid cache busting
 COPY start*.sh /usr/local/bin/
-COPY init.sh /usr/local/bin//before-notebook.d/
+COPY populate.sh /usr/local/bin/start-notebook.d/
+COPY init.sh /usr/local/bin/before-notebook.d/
 COPY jupyter_notebook_config.py /etc/jupyter/
 COPY startup.jl ${JULIA_PATH}/etc/julia/startup.jl
-COPY --chown=$NB_UID:$NB_GID .p10k.zsh.sample .
 
 EXPOSE 8888
 
