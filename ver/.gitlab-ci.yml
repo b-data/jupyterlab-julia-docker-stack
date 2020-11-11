@@ -31,9 +31,9 @@ build-latest:
 build-version:
   stage: build
   script:
-    - cd ver && docker build --pull -t $CI_REGISTRY_IMAGE:1.5.1 -f 1.5.1.Dockerfile .
-    - docker push $CI_REGISTRY_IMAGE:1.5.1
+    - cd ver && docker build --pull -t $CI_REGISTRY_IMAGE:1.5.2 -f 1.5.2.Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE:1.5.2
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version"
       changes:
-        - ver/1.5.1.Dockerfile
+        - ver/1.5.2.Dockerfile
