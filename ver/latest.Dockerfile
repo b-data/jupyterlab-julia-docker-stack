@@ -128,7 +128,7 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
   && cd /var/tmp/ \
-  && curl -sLO https://dl.b-data.ch/vsix/julialang.language-julia-1.1.17.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/julialang.language-julia-1.1.25.vsix \
   && mkdir -p /usr/local/bin/start-notebook.d \
   && mkdir -p /usr/local/bin/before-notebook.d \
   && cd / \
