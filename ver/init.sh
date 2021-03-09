@@ -6,11 +6,11 @@ set -e
 
 if [ $(id -u) == 0 ] ; then
     # Install Code Server extension for Julia Language Supprt
-    if [[ $(find .local/share/code-server/extensions -type d -name "julialang.language-julia-1.1.17" | wc -l) != "0" ]]; then
-      su $NB_USER -c "rm -r .local/share/code-server/extensions/julialang.language-julia-1.1.17"
+    if [[ $(find .local/share/code-server/extensions -type d -name "julialang.language-julia-1.1.25" | wc -l) != "0" ]]; then
+      su $NB_USER -c "rm -r .local/share/code-server/extensions/julialang.language-julia-1.1.25"
     fi
-    if [[ ! -d ".local/share/code-server/extensions/julialang.language-julia-1.1.25.vsix" ]]; then
-      su $NB_USER -c "code-server --install-extension /var/tmp/julialang.language-julia-1.1.25.vsix || true"
+    if [[ ! -d ".local/share/code-server/extensions/julialang.language-julia-1.1.32.vsix" ]]; then
+      su $NB_USER -c "code-server --install-extension /var/tmp/julialang.language-julia-1.1.32.vsix || true"
     fi
 
     # Clone JuliaBoxTutorials
@@ -39,11 +39,11 @@ if [ $(id -u) == 0 ] ; then
       .local/share/code-server/User/settings.json"
 else
     # Install Code Server extension for Julia Language Supprt
-    if [[ $(find .local/share/code-server/extensions -type d -name "julialang.language-julia-1.1.17" | wc -l) != "0" ]]; then
-      rm -r .local/share/code-server/extensions/julialang.language-julia-1.1.17
+    if [[ $(find .local/share/code-server/extensions -type d -name "julialang.language-julia-1.1.25" | wc -l) != "0" ]]; then
+      rm -r .local/share/code-server/extensions/julialang.language-julia-1.1.25
     fi
-    if [[ ! -d ".local/share/code-server/extensions/julialang.language-julia-1.1.25.vsix" ]]; then
-      code-server --install-extension /var/tmp/julialang.language-julia-1.1.25.vsix || true
+    if [[ ! -d ".local/share/code-server/extensions/julialang.language-julia-1.1.32.vsix" ]]; then
+      code-server --install-extension /var/tmp/julialang.language-julia-1.1.32.vsix || true
     fi
 
     # Clone JuliaBoxTutorials
