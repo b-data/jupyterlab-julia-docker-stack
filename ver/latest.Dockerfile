@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/julia/ver:1.5.2
+FROM registry.gitlab.b-data.ch/julia/ver:1.5.3
 
 LABEL org.label-schema.license="MIT" \
       org.label-schema.vcs-url="https://gitlab.b-data.ch/jupyterlab/julia/docker-stack" \
@@ -16,11 +16,11 @@ ARG PANDOC_VERSION
 ENV NB_USER=${NB_USER:-jovyan} \
     NB_UID=${NB_UID:-1000} \
     NB_GID=${NB_GID:-100} \
-    JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.0.0} \
-    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-2.2.8} \
-    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.6.0} \
+    JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.3.0} \
+    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-3.0.9} \
+    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.9.1} \
     CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
-    PANDOC_VERSION=${PANDOC_VERSION:-2.9}
+    PANDOC_VERSION=${PANDOC_VERSION:-2.10.1}
 
 USER root
 
@@ -84,10 +84,12 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && rm get-pip.py \
   ## Install Python packages
   && pip3 install \
+    jupyter-server-proxy \
     jupyterhub==${JUPYTERHUB_VERSION} \
     jupyterlab==${JUPYTERLAB_VERSION} \
+    jupyterlab-git==0.30.0b2 \
     nbgrader==0.5.4 \
-    notebook==6.0.3 \
+    notebook \
     nbconvert \
   ## Install Node.js
   && curl -sL https://deb.nodesource.com/setup_12.x | bash \
@@ -102,8 +104,6 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
     python2.7-minimal" \
   && apt-get install -y --no-install-recommends nodejs $DEPS \
   ## Install JupyterLab extensions
-  && pip3 install jupyter-server-proxy jupyterlab-git \
-  && jupyter serverextension enable --py jupyter_server_proxy --sys-prefix \
   && jupyter serverextension enable --py nbgrader --sys-prefix \
   && jupyter nbextension install --py nbgrader --sys-prefix --overwrite \
   && jupyter nbextension enable --py nbgrader --sys-prefix \
@@ -113,20 +113,22 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && echo '{\n  "@jupyterlab/apputils-extension:themes": {\n    "theme": "JupyterLab Dark"\n  }\n}' > /usr/local/share/jupyter/lab/settings/overrides.json \
   ## Install code-server extensions
   && cd /tmp \
-  && curl -sLO https://dl.b-data.ch/vsix/alefragnani.project-manager-11.3.0.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-11.3.0.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/alefragnani.project-manager-12.0.1.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-12.0.1.vsix \
   && curl -sLO https://dl.b-data.ch/vsix/fabiospampinato.vscode-terminals-1.12.9.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension fabiospampinato.vscode-terminals-1.12.9.vsix \
-  && curl -sLO https://dl.b-data.ch/vsix/GitLab.gitlab-workflow-3.3.0.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.3.0.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python@2020.5.86806 \
+  && curl -sLO https://dl.b-data.ch/vsix/GitLab.gitlab-workflow-3.14.0.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.14.0.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/ms-toolsai.jupyter-2020.11.399280825.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-toolsai.jupyter-2020.11.399280825.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
   && cd /var/tmp/ \
-  && curl -sLO https://dl.b-data.ch/vsix/julialang.language-julia-1.0.8.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/julialang.language-julia-1.1.32.vsix \
   && mkdir -p /usr/local/bin/start-notebook.d \
   && mkdir -p /usr/local/bin/before-notebook.d \
   && cd / \
@@ -165,7 +167,7 @@ ENV HOME=/home/${NB_USER} \
 WORKDIR ${HOME}
 
 RUN mkdir -p .local/share/code-server/User \
-  && echo '{\n    "editor.tabSize": 2,\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "julia.enableCrashReporter": false,\n    "julia.enableTelemetry": false,\n    "julia.format.indent": 2,\n    "python.dataScience.jupyterServerURI": "http://localhost:8888${env:JUPYTERHUB_SERVICE_PREFIX}?token=${env:JUPYTERHUB_API_TOKEN}",\n    "python.pythonPath": "/usr/bin/python3",\n    "workbench.colorTheme": "Default Dark+"\n}' > .local/share/code-server/User/settings.json \
+  && echo '{\n    "editor.tabSize": 2,\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "julia.enableCrashReporter": false,\n    "julia.enableTelemetry": false,\n    "julia.format.indent": 2,\n    "python.pythonPath": "/usr/bin/python3",\n    "workbench.colorTheme": "Default Dark+"\n}' > .local/share/code-server/User/settings.json \
   && cp .local/share/code-server/User/settings.json /var/tmp \
   && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended \
   && git clone --depth=1 https://github.com/romkatv/powerlevel10k.git .oh-my-zsh/custom/themes/powerlevel10k \
