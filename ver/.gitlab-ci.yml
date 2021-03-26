@@ -140,9 +140,6 @@ build-manifest:version-linux-multiarch:
     - >    
       docker manifest create $CI_APP_REPO:$CI_APP_TAG $CI_MANIFEST_LIST
       && docker manifest push $CI_APP_REPO:$CI_APP_TAG
-
-      docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN $CI_MANIFEST_LIST
-      && docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version"
       changes:
