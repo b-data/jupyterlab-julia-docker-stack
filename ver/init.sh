@@ -9,8 +9,8 @@ if [ $(id -u) == 0 ] ; then
     if [[ $(find .local/share/code-server/extensions -type d -name "julialang.language-julia-1.1.32" | wc -l) != "0" ]]; then
       su $NB_USER -c "rm -r .local/share/code-server/extensions/julialang.language-julia-1.1.32"
     fi
-    if [[ ! -d ".local/share/code-server/extensions/julialang.language-julia-1.1.37.vsix" ]]; then
-      su $NB_USER -c "code-server --install-extension /var/tmp/julialang.language-julia-1.1.37.vsix || true"
+    if [[ ! -d ".local/share/code-server/extensions/julialang.language-julia-1.1.37" ]]; then
+      su $NB_USER -c "code-server --install-extension /var/tmp/julialang.language-julia-1.1.37.vsix"
     fi
 
     # Clone JuliaBoxTutorials
@@ -42,8 +42,8 @@ else
     if [[ $(find .local/share/code-server/extensions -type d -name "julialang.language-julia-1.1.32" | wc -l) != "0" ]]; then
       rm -r .local/share/code-server/extensions/julialang.language-julia-1.1.32
     fi
-    if [[ ! -d ".local/share/code-server/extensions/julialang.language-julia-1.1.37.vsix" ]]; then
-      code-server --install-extension /var/tmp/julialang.language-julia-1.1.37.vsix || true
+    if [[ ! -d ".local/share/code-server/extensions/julialang.language-julia-1.1.37" ]]; then
+      code-server --install-extension /var/tmp/julialang.language-julia-1.1.37.vsix
     fi
 
     # Clone JuliaBoxTutorials
