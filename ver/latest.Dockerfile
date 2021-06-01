@@ -20,7 +20,7 @@ ENV NB_USER=${NB_USER:-jovyan} \
     JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-3.0.16} \
     CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.10.2} \
     CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
-    PANDOC_VERSION=${PANDOC_VERSION:-2.13}
+    PANDOC_VERSION=${PANDOC_VERSION:-2.14}
 
 USER root
 
@@ -139,7 +139,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
   && cd /var/tmp/ \
-  && curl -sLO https://open-vsx.org/api/julialang/language-julia/1.1.40/file/julialang.language-julia-1.1.40.vsix \
+  && curl -sLO https://open-vsx.org/api/julialang/language-julia/1.2.1/file/julialang.language-julia-1.2.1.vsix \
   && mkdir -p /usr/local/bin/start-notebook.d \
   && mkdir -p /usr/local/bin/before-notebook.d \
   && cd / \
