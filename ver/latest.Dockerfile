@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/julia/ver:1.6.1
+FROM registry.gitlab.b-data.ch/julia/ver:1.6.2
 
 LABEL org.label-schema.license="MIT" \
       org.label-schema.vcs-url="https://gitlab.b-data.ch/jupyterlab/julia/docker-stack" \
@@ -125,12 +125,12 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && echo '{\n  "@jupyterlab/apputils-extension:themes": {\n    "theme": "JupyterLab Dark"\n  }\n}' > /usr/local/share/jupyter/lab/settings/overrides.json \
   ## Install code-server extensions
   && cd /tmp \
-  && curl -sLO https://dl.b-data.ch/vsix/alefragnani.project-manager-12.2.0.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-12.2.0.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/alefragnani.project-manager-12.3.0.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-12.3.0.vsix \
   && curl -sLO https://dl.b-data.ch/vsix/fabiospampinato.vscode-terminals-1.12.9.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension fabiospampinato.vscode-terminals-1.12.9.vsix \
-  && curl -sLO https://open-vsx.org/api/GitLab/gitlab-workflow/3.25.0/file/GitLab.gitlab-workflow-3.25.0.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.25.0.vsix \
+  && curl -sLO https://open-vsx.org/api/GitLab/gitlab-workflow/3.26.0/file/GitLab.gitlab-workflow-3.26.0.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.26.0.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
