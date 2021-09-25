@@ -1,56 +1,71 @@
-FROM registry.gitlab.b-data.ch/julia/ver:1.6.1
+ARG BASE_IMAGE=debian:bullseye
+ARG GIT_VERSION=2.32.0
 
-LABEL org.label-schema.license="MIT" \
-      org.label-schema.vcs-url="https://gitlab.b-data.ch/jupyterlab/julia/docker-stack" \
-      maintainer="Olivier Benz <olivier.benz@b-data.ch>"
+FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} as gsi
 
-ARG NB_USER
-ARG NB_UID
-ARG NB_GID
-ARG JUPYTERHUB_VERSION
-ARG JUPYTERLAB_VERSION
-ARG CODE_SERVER_RELEASE
+FROM registry.gitlab.b-data.ch/julia/ver:1.6.2
+
+LABEL org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.source="https://gitlab.b-data.ch/jupyterlab/julia/docker-stack" \
+      org.opencontainers.image.vendor="b-data GmbH" \
+      org.opencontainers.image.authors="Olivier Benz <olivier.benz@b-data.ch>"
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+ARG NB_USER=jovyan
+ARG NB_UID=1000
+ARG NB_GID=100
+ARG JUPYTERHUB_VERSION=1.4.2
+ARG JUPYTERLAB_VERSION=3.1.12
+ARG CODE_SERVER_RELEASE=3.12.0
+ARG GIT_VERSION=2.32.0
+ARG PANDOC_VERSION=2.14.2
 ARG CODE_WORKDIR
-ARG PANDOC_VERSION
 
-ENV NB_USER=${NB_USER:-jovyan} \
-    NB_UID=${NB_UID:-1000} \
-    NB_GID=${NB_GID:-100} \
-    JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.4.1} \
-    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-3.0.16} \
-    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.10.2} \
+ENV NB_USER=${NB_USER} \
+    NB_UID=${NB_UID} \
+    NB_GID=${NB_GID} \
+    JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION} \
+    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION} \
+    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE} \
+    GIT_VERSION=${GIT_VERSION} \
+    PANDOC_VERSION=${PANDOC_VERSION} \
     CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
-    PANDOC_VERSION=${PANDOC_VERSION:-2.14.0.3}
+    SERVICE_URL=https://open-vsx.org/vscode/gallery \
+    ITEM_URL=https://open-vsx.org/vscode/item
+
+COPY --from=gsi /usr/local /usr/local
 
 USER root
 
 RUN apt-get update \
   && apt-get -y install --no-install-recommends \
-    #curl \
     file \
     fontconfig \
     git \
     gnupg \
+    info \
     jq \
-    less \
-    #libclang-dev \
-    #lsb-release \
+    libclang-dev \
+    lsb-release \
     man-db \
-    #multiarch-support \
     nano \
     procps \
     psmisc \
     python3-venv \
     python3-virtualenv \
     screen \
-    ssh \
     sudo \
     tmux \
     vim \
     wget \
     zsh \
-    ## Current ZeroMQ library for Julia ZMQ
-    #libzmq3-dev \
+    ## Additional git runtime dependencies
+    libcurl3-gnutls \
+    liberror-perl \
+    ## Additional git runtime recommendations
+    less \
+    ssh-client \
   ## Clean up
   && rm -rf /var/lib/apt/lists/* \
   ## Install font MesloLGS NF
@@ -64,8 +79,12 @@ RUN apt-get update \
   && curl -sLO https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
   && dpkg -i pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
   && rm pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
-  ## configure git not to request password each time
+  ## Set default branch name to main
+  && sudo git config --system init.defaultBranch main \
+  ## Store passwords for one hour in memory
   && git config --system credential.helper "cache --timeout=3600" \
+  ## Merge the default branch from the default remote when "git pull" is run
+  && sudo git config --system pull.rebase false \
   ## Add user
   && useradd -m -s /bin/bash -N -u ${NB_UID} ${NB_USER}
 
@@ -103,56 +122,37 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && if [ "$dpkgArch" = "arm64" ]; then \
     apt-get remove --purge -y $DEPS; \
   fi \
-  ## Install Node.js
-  && curl -sL https://deb.nodesource.com/setup_12.x | bash \
-  && DEPS="libpython-stdlib \
-    libpython2-stdlib \
-    libpython2.7-minimal \
-    libpython2.7-stdlib \
-    python \
-    python-minimal \
-    python2 python2-minimal \
-    python2.7 \
-    python2.7-minimal" \
-  && apt-get install -y --no-install-recommends nodejs $DEPS \
-  ## Install JupyterLab extensions
+  ## Install Notebooks extensions
   && jupyter serverextension enable --py nbgrader --sys-prefix \
   && jupyter nbextension install --py nbgrader --sys-prefix --overwrite \
   && jupyter nbextension enable --py nbgrader --sys-prefix \
-  && jupyter labextension install @jupyterlab/server-proxy --no-build \
-  && jupyter labextension install @jupyterlab/git --no-build \
-  && jupyter lab build \
+  ## Set JupyterLab Dark theme
+  && mkdir -p /usr/local/share/jupyter/lab/settings \
   && echo '{\n  "@jupyterlab/apputils-extension:themes": {\n    "theme": "JupyterLab Dark"\n  }\n}' > /usr/local/share/jupyter/lab/settings/overrides.json \
   ## Install code-server extensions
   && cd /tmp \
-  && curl -sLO https://dl.b-data.ch/vsix/alefragnani.project-manager-12.2.0.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-12.2.0.vsix \
-  && curl -sLO https://dl.b-data.ch/vsix/fabiospampinato.vscode-terminals-1.12.9.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension fabiospampinato.vscode-terminals-1.12.9.vsix \
-  && curl -sLO https://open-vsx.org/api/GitLab/gitlab-workflow/3.25.0/file/GitLab.gitlab-workflow-3.25.0.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.25.0.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/alefragnani.project-manager-12.4.0.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-12.4.0.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/piotrpalarz.vscode-gitignore-generator-1.0.3.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator-1.0.3.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
   && cd /var/tmp/ \
-  && curl -sLO https://open-vsx.org/api/julialang/language-julia/1.2.5/file/julialang.language-julia-1.2.5.vsix \
+  && curl -sLO https://open-vsx.org/api/julialang/language-julia/1.4.0/file/julialang.language-julia-1.4.0.vsix \
   && mkdir -p /usr/local/bin/start-notebook.d \
   && mkdir -p /usr/local/bin/before-notebook.d \
   && cd / \
-  ## Clean up (Node.js)
+  ## Clean up
   && rm -rf /tmp/* \
-  && apt-get remove --purge -y nodejs $DEPS \
   && apt-get autoremove -y \
   && apt-get autoclean -y \
   && rm -rf /var/lib/apt/lists/* \
     /root/.cache \
-    /root/.config \
-    /root/.local \
-    /root/.npm \
-    /usr/local/share/.cache
+    /root/.config
 
 ## Install the Julia kernel for JupyterLab
 RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
