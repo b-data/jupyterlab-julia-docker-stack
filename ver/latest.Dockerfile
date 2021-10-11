@@ -42,7 +42,6 @@ RUN apt-get update \
   && apt-get -y install --no-install-recommends \
     file \
     fontconfig \
-    git \
     gnupg \
     info \
     jq \
@@ -115,17 +114,12 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     jupyterhub==${JUPYTERHUB_VERSION} \
     jupyterlab==${JUPYTERLAB_VERSION} \
     jupyterlab-git \
-    nbgrader==0.5.4 \
     notebook \
     nbconvert \
   # Remove gcc and python3-dev
   && if [ "$dpkgArch" = "arm64" ]; then \
     apt-get remove --purge -y $DEPS; \
   fi \
-  ## Install Notebooks extensions
-  && jupyter serverextension enable --py nbgrader --sys-prefix \
-  && jupyter nbextension install --py nbgrader --sys-prefix --overwrite \
-  && jupyter nbextension enable --py nbgrader --sys-prefix \
   ## Set JupyterLab Dark theme
   && mkdir -p /usr/local/share/jupyter/lab/settings \
   && echo '{\n  "@jupyterlab/apputils-extension:themes": {\n    "theme": "JupyterLab Dark"\n  }\n}' > /usr/local/share/jupyter/lab/settings/overrides.json \
@@ -149,7 +143,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   ## Clean up
   && rm -rf /tmp/* \
   && apt-get autoremove -y \
-  && apt-get autoclean -y \
+  && apt-get clean -y \
   && rm -rf /var/lib/apt/lists/* \
     /root/.cache \
     /root/.config
@@ -190,10 +184,7 @@ RUN mkdir -p .local/share/code-server/User \
   && cp -a $HOME /var/tmp
 
 ## Copy local files as late as possible to avoid cache busting
-COPY start*.sh /usr/local/bin/
-COPY populate.sh /usr/local/bin/start-notebook.d/
-COPY init.sh /usr/local/bin/before-notebook.d/
-COPY jupyter_notebook_config.py /etc/jupyter/
+COPY scripts/. /
 COPY startup.jl ${JULIA_PATH}/etc/julia/startup.jl
 
 EXPOSE 8888
