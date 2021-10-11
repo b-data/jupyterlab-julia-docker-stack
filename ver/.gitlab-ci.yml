@@ -54,8 +54,7 @@ build:latest-linux-amd64:
       FROM $CI_APP_REPO:$CI_APP_TAG-linux-amd64
       USER root
       EOF
-    - |
-      docker push -a $CI_APP_REPO
+    - docker push -a $CI_APP_REPO
   rules:
     - if: $CI_COMMIT_BRANCH == "master" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
       changes:
@@ -77,8 +76,7 @@ build:latest-linux-arm64v8:
       FROM $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
       USER root
       EOF
-    - |
-      docker push -a $CI_APP_REPO
+    - docker push -a $CI_APP_REPO
   rules:
     - if: $CI_COMMIT_BRANCH == "master" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
       changes:
@@ -93,7 +91,7 @@ build:version-linux-amd64:
     - >
       cd ver && docker build -t $CI_APP_REPO:$CI_APP_TAG-linux-amd64
       -f $CI_APP_TAG.Dockerfile .
-    - >
+    - |
       docker build -t $CI_APP_REPO:$CI_APP_TAG-root-linux-amd64 -<<EOF
       FROM $CI_APP_REPO:$CI_APP_TAG-linux-amd64
       USER root
@@ -115,7 +113,7 @@ build:version-linux-arm64v8:
     - >
       cd ver && docker build -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
       -f $CI_APP_TAG.Dockerfile .
-    - >
+    - |
       docker build -t $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8 -<<EOF
       FROM $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
       USER root
