@@ -48,8 +48,8 @@ build:latest-linux-amd64:
       cd ver && docker build -t $CI_APP_REPO:$CI_APP_TAG-linux-amd64
       -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-linux-amd64
       -f $CI_APP_TAG.Dockerfile .
-    - >
-      docker build -t $CI_APP_REPO-root:$CI_APP_TAG-linux-amd64
+    - |
+      docker build -t $CI_APP_REPO-root:$CI_APP_TAG-linux-amd64 \
       -t $CI_APP_REPO-root:$VERSION_MAJ_MIN_PAT-linux-amd64 -<<EOF
       FROM $CI_APP_REPO:$CI_APP_TAG-linux-amd64
       USER root
@@ -72,9 +72,9 @@ build:latest-linux-arm64v8:
       cd ver && docker build -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
       -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-linux-arm64v8
       -f $CI_APP_TAG.Dockerfile .
-    - >
-      docker build -t $CI_APP_REPO-root:$CI_APP_TAG-linux-arm64v8
-      -t $CI_APP_REPO-root:$VERSION_MAJ_MIN_PAT-linux-arm64v8-<<EOF
+    - |
+      docker build -t $CI_APP_REPO-root:$CI_APP_TAG-linux-arm64v8 \
+      -t $CI_APP_REPO-root:$VERSION_MAJ_MIN_PAT-linux-arm64v8 -<<EOF
       FROM $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
       USER root
       EOF
