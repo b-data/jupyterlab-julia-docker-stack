@@ -1,9 +1,9 @@
 ARG BASE_IMAGE=debian:bullseye
-ARG GIT_VERSION=2.32.0
+ARG GIT_VERSION=2.33.1
 
 FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} as gsi
 
-FROM registry.gitlab.b-data.ch/julia/ver:1.6.2
+FROM registry.gitlab.b-data.ch/julia/ver:1.6.3
 
 LABEL org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.source="https://gitlab.b-data.ch/jupyterlab/julia/docker-stack" \
@@ -16,10 +16,10 @@ ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG NB_GID=100
 ARG JUPYTERHUB_VERSION=1.4.2
-ARG JUPYTERLAB_VERSION=3.1.12
+ARG JUPYTERLAB_VERSION=3.2.3
 ARG CODE_SERVER_RELEASE=3.12.0
-ARG GIT_VERSION=2.32.0
-ARG PANDOC_VERSION=2.14.2
+ARG GIT_VERSION=2.33.1
+ARG PANDOC_VERSION=2.16.1
 ARG CODE_WORKDIR
 
 ENV NB_USER=${NB_USER} \
@@ -30,7 +30,6 @@ ENV NB_USER=${NB_USER} \
     CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE} \
     GIT_VERSION=${GIT_VERSION} \
     PANDOC_VERSION=${PANDOC_VERSION} \
-    CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
     SERVICE_URL=https://open-vsx.org/vscode/gallery \
     ITEM_URL=https://open-vsx.org/vscode/item
 
@@ -42,7 +41,6 @@ RUN apt-get update \
   && apt-get -y install --no-install-recommends \
     file \
     fontconfig \
-    git \
     gnupg \
     info \
     jq \
@@ -89,7 +87,7 @@ RUN apt-get update \
   && useradd -m -s /bin/bash -N -u ${NB_UID} ${NB_USER}
 
 ## Install code-server
-RUN mkdir -p ${CODE_BUILTIN_EXTENSIONS_DIR} \
+RUN mkdir /opt/code-server \
   && cd /opt/code-server \
   && curl -sL https://github.com/cdr/code-server/releases/download/v${CODE_SERVER_RELEASE}/code-server-${CODE_SERVER_RELEASE}-linux-$(dpkg --print-architecture).tar.gz | tar zxf - --strip-components=1 \
   && curl -sL https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg -o vscode.svg \
@@ -98,7 +96,8 @@ RUN mkdir -p ${CODE_BUILTIN_EXTENSIONS_DIR} \
 ENV PATH=/opt/code-server/bin:$PATH
 
 ## Install JupyterLab
-RUN dpkgArch="$(dpkg --print-architecture)" \
+RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-dev/extensions \
+  && dpkgArch="$(dpkg --print-architecture)" \
   && curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && python3 get-pip.py \
   && rm get-pip.py \
@@ -115,17 +114,12 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     jupyterhub==${JUPYTERHUB_VERSION} \
     jupyterlab==${JUPYTERLAB_VERSION} \
     jupyterlab-git \
-    nbgrader==0.5.4 \
     notebook \
     nbconvert \
   # Remove gcc and python3-dev
   && if [ "$dpkgArch" = "arm64" ]; then \
     apt-get remove --purge -y $DEPS; \
   fi \
-  ## Install Notebooks extensions
-  && jupyter serverextension enable --py nbgrader --sys-prefix \
-  && jupyter nbextension install --py nbgrader --sys-prefix --overwrite \
-  && jupyter nbextension enable --py nbgrader --sys-prefix \
   ## Set JupyterLab Dark theme
   && mkdir -p /usr/local/share/jupyter/lab/settings \
   && echo '{\n  "@jupyterlab/apputils-extension:themes": {\n    "theme": "JupyterLab Dark"\n  }\n}' > /usr/local/share/jupyter/lab/settings/overrides.json \
@@ -149,7 +143,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   ## Clean up
   && rm -rf /tmp/* \
   && apt-get autoremove -y \
-  && apt-get autoclean -y \
+  && apt-get clean -y \
   && rm -rf /var/lib/apt/lists/* \
     /root/.cache \
     /root/.config
@@ -190,10 +184,7 @@ RUN mkdir -p .local/share/code-server/User \
   && cp -a $HOME /var/tmp
 
 ## Copy local files as late as possible to avoid cache busting
-COPY start*.sh /usr/local/bin/
-COPY populate.sh /usr/local/bin/start-notebook.d/
-COPY init.sh /usr/local/bin/before-notebook.d/
-COPY jupyter_notebook_config.py /etc/jupyter/
+COPY scripts/. /
 COPY startup.jl ${JULIA_PATH}/etc/julia/startup.jl
 
 EXPOSE 8888
