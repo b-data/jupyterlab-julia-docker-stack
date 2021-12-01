@@ -3,7 +3,7 @@ ARG GIT_VERSION=2.34.1
 
 FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} as gsi
 
-FROM registry.gitlab.b-data.ch/julia/ver:1.6.4
+FROM registry.gitlab.b-data.ch/julia/ver:1.7.0
 
 LABEL org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.source="https://gitlab.b-data.ch/jupyterlab/julia/docker-stack" \
