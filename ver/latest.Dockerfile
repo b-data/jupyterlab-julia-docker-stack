@@ -1,9 +1,9 @@
 ARG BASE_IMAGE=debian:bullseye
-ARG GIT_VERSION=2.33.1
+ARG GIT_VERSION=2.34.1
 
 FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} as gsi
 
-FROM registry.gitlab.b-data.ch/julia/ver:1.6.3
+FROM registry.gitlab.b-data.ch/julia/ver:1.6.4
 
 LABEL org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.source="https://gitlab.b-data.ch/jupyterlab/julia/docker-stack" \
@@ -16,10 +16,10 @@ ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG NB_GID=100
 ARG JUPYTERHUB_VERSION=1.4.2
-ARG JUPYTERLAB_VERSION=3.2.3
+ARG JUPYTERLAB_VERSION=3.2.4
 ARG CODE_SERVER_RELEASE=3.12.0
-ARG GIT_VERSION=2.33.1
-ARG PANDOC_VERSION=2.16.1
+ARG GIT_VERSION=2.34.1
+ARG PANDOC_VERSION=2.16.2
 ARG CODE_WORKDIR
 
 ENV NB_USER=${NB_USER} \
