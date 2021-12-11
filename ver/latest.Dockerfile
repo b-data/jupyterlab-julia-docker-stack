@@ -107,13 +107,10 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
   && curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && python3 get-pip.py \
   && rm get-pip.py \
-  ## Install gcc and python3-dev to build argon2-cffi on aarch64
-  ## https://github.com/hynek/argon2-cffi/issues/73
-  && if [ "$dpkgArch" = "arm64" ]; then \
-    DEPS="gcc python3-dev"; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends $DEPS; \
-  fi \
+  ## Install gcc and python3-dev to build wheels
+  && DEPS="gcc python3-dev" \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends $DEPS \
   ## Install Python packages
   && pip3 install \
     jupyter-server-proxy \
@@ -123,9 +120,7 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
     notebook \
     nbconvert \
   # Remove gcc and python3-dev
-  && if [ "$dpkgArch" = "arm64" ]; then \
-    apt-get remove --purge -y $DEPS; \
-  fi \
+  && apt-get remove --purge -y $DEPS \
   ## Set JupyterLab Dark theme
   && mkdir -p /usr/local/share/jupyter/lab/settings \
   && echo '{\n  "@jupyterlab/apputils-extension:themes": {\n    "theme": "JupyterLab Dark"\n  },\n  "@jupyterlab/terminal-extension:plugin": {\n    "fontFamily": "MesloLGS NF"\n  }\n}' > /usr/local/share/jupyter/lab/settings/overrides.json \
