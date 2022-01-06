@@ -30,11 +30,11 @@ if [ "$(id -u)" == 0 ] ; then
   update-locale --reset LANG=$LANG
 
   # Install code-server extension for Julia Language Supprt
-  if [[ $(find .local/share/code-server/extensions -type d -name "julialang.language-julia-1.2.8" | wc -l) != "0" ]]; then
-    su $NB_USER -c "rm -r .local/share/code-server/extensions/julialang.language-julia-1.2.8"
+  if [[ $(find .local/share/code-server/extensions -type d -name "julialang.language-julia-1.4.0" | wc -l) != "0" ]]; then
+    su $NB_USER -c "rm -r .local/share/code-server/extensions/julialang.language-julia-1.4.0"
   fi
-  if [[ ! -d ".local/share/code-server/extensions/julialang.language-julia-1.4.0" ]]; then
-    su $NB_USER -c "code-server --install-extension /var/tmp/julialang.language-julia-1.4.0.vsix"
+  if [[ ! -d ".local/share/code-server/extensions/julialang.language-julia-1.5.8" ]]; then
+    su $NB_USER -c "code-server --install-extension /var/tmp/julialang.language-julia-1.5.8.vsix"
   fi
 
   # Install user-specific startup files for Julia REPL and IJulia
@@ -70,11 +70,11 @@ else
   fi
 
   # Install code-server extension for Julia Language Supprt
-  if [[ $(find .local/share/code-server/extensions -type d -name "julialang.language-julia-1.2.8" | wc -l) != "0" ]]; then
-    rm -r .local/share/code-server/extensions/julialang.language-julia-1.2.8
+  if [[ $(find .local/share/code-server/extensions -type d -name "julialang.language-julia-1.4.0" | wc -l) != "0" ]]; then
+    rm -r .local/share/code-server/extensions/julialang.language-julia-1.4.0
   fi
-  if [[ ! -d ".local/share/code-server/extensions/julialang.language-julia-1.4.0" ]]; then
-    code-server --install-extension /var/tmp/julialang.language-julia-1.4.0.vsix
+  if [[ ! -d ".local/share/code-server/extensions/julialang.language-julia-1.5.8" ]]; then
+    code-server --install-extension /var/tmp/julialang.language-julia-1.5.8.vsix
   fi
 
   # Install user-specific startup files for Julia REPL and IJulia
