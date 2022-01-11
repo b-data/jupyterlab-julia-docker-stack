@@ -29,14 +29,6 @@ if [ "$(id -u)" == 0 ] ; then
   fi
   update-locale --reset LANG=$LANG
 
-  # Install code-server extension for Julia Language Supprt
-  if [[ $(find .local/share/code-server/extensions -type d -name "julialang.language-julia-1.4.0" | wc -l) != "0" ]]; then
-    su $NB_USER -c "rm -r .local/share/code-server/extensions/julialang.language-julia-1.4.0"
-  fi
-  if [[ ! -d ".local/share/code-server/extensions/julialang.language-julia-1.5.8" ]]; then
-    su $NB_USER -c "code-server --install-extension /var/tmp/julialang.language-julia-1.5.8.vsix"
-  fi
-
   # Install user-specific startup files for Julia REPL and IJulia
   su $NB_USER -c "mkdir -p .julia/config"
   if [[ ! -f ".julia/config/startup_ijulia.jl" ]]; then
@@ -67,14 +59,6 @@ else
   # as root.
   if [[ "$LANG" != "en_US.UTF-8" || ! -z "$LANGS" ]]; then
     echo "Container must be run as root to update or add locale"
-  fi
-
-  # Install code-server extension for Julia Language Supprt
-  if [[ $(find .local/share/code-server/extensions -type d -name "julialang.language-julia-1.4.0" | wc -l) != "0" ]]; then
-    rm -r .local/share/code-server/extensions/julialang.language-julia-1.4.0
-  fi
-  if [[ ! -d ".local/share/code-server/extensions/julialang.language-julia-1.5.8" ]]; then
-    code-server --install-extension /var/tmp/julialang.language-julia-1.5.8.vsix
   fi
 
   # Install user-specific startup files for Julia REPL and IJulia
