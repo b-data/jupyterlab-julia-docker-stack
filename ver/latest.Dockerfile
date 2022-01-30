@@ -1,5 +1,5 @@
 ARG BASE_IMAGE=debian:bullseye
-ARG GIT_VERSION=2.35.0
+ARG GIT_VERSION=2.35.1
 
 FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} as gsi
 
@@ -18,7 +18,7 @@ ARG NB_GID=100
 ARG JUPYTERHUB_VERSION=1.5.0
 ARG JUPYTERLAB_VERSION=3.2.8
 ARG CODE_SERVER_RELEASE=4.0.1
-ARG GIT_VERSION=2.35.0
+ARG GIT_VERSION=2.35.1
 ARG GIT_LFS_VERSION=3.0.2
 ARG PANDOC_VERSION=2.17.0.1
 ARG CODE_WORKDIR
@@ -181,7 +181,8 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
   && apt-get autoremove -y \
   && rm -rf /var/lib/apt/lists/* \
     /root/.cache \
-    /root/.config
+    /root/.config \
+    /root/.vscode-remote
 
 ## Install the Julia kernel for JupyterLab
 RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
@@ -207,7 +208,6 @@ WORKDIR ${HOME}
 
 RUN mkdir -p .local/share/code-server/User \
   && echo '{\n    "editor.tabSize": 2,\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "julia.enableCrashReporter": false,\n    "julia.enableTelemetry": false,\n    "julia.format.indent": 2,\n    "workbench.colorTheme": "Default Dark+",\n    "terminal.integrated.fontFamily": "MesloLGS NF"\n}' > .local/share/code-server/User/settings.json \
-  && cp .local/share/code-server/User/settings.json /var/tmp \
   && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended \
   && git clone --depth=1 https://github.com/romkatv/powerlevel10k.git .oh-my-zsh/custom/themes/powerlevel10k \
   && sed -i 's/ZSH="\/home\/jovyan\/.oh-my-zsh"/ZSH="$HOME\/.oh-my-zsh"/g' .zshrc \
@@ -216,13 +216,14 @@ RUN mkdir -p .local/share/code-server/User \
   && echo "\n# set PATH so it includes user's private bin if it exists\nif [ -d "\$HOME/.local/bin" ] ; then\n    PATH="\$HOME/.local/bin:\$PATH"\nfi" | tee -a .bashrc .zshrc \
   && echo "\n# To customize prompt, run \`p10k configure\` or edit ~/.p10k.zsh." >> .zshrc \
   && echo "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh" >> .zshrc \
-  && cp -a $HOME /var/tmp
+  && mkdir /var/tmp/skel \
+  && cp -a $HOME/. /var/tmp/skel
 
 ## Copy local files as late as possible to avoid cache busting
 COPY assets/. /
 COPY scripts/. /
 COPY --chown=${NB_UID}:${NB_GID} .p10k.zsh ${HOME}/.p10k.zsh
-COPY --chown=${NB_UID}:${NB_GID} .p10k.zsh /var/tmp/${NB_USER}/.p10k.zsh
+COPY --chown=${NB_UID}:${NB_GID} .p10k.zsh /var/tmp/skel/.p10k.zsh
 COPY startup.jl ${JULIA_PATH}/etc/julia/startup.jl
 
 EXPOSE 8888

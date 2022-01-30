@@ -43,9 +43,10 @@ if [ "$(id -u)" == 0 ] ; then
   # Update code-server settings
   su $NB_USER -c "mv .local/share/code-server/User/settings.json \
     .local/share/code-server/User/settings.json.bak"
-  su $NB_USER -c "sed -i ':a;N;$!ba;s/,\n\}/\n}/g' \
+  su $NB_USER -c "sed -i ':a;N;\$!ba;s/,\n\}/\n}/g' \
     .local/share/code-server/User/settings.json.bak"
-  su $NB_USER -c "jq -s '.[0] * .[1]' /var/tmp/settings.json \
+  su $NB_USER -c "jq -s '.[0] * .[1]' \
+    /var/tmp/skel/.local/share/code-server/User/settings.json \
     .local/share/code-server/User/settings.json.bak > \
     .local/share/code-server/User/settings.json"
 else
@@ -55,8 +56,8 @@ else
     echo "Container must be run as root to change timezone"
   fi
 
-  # Warn if the user wants to change the timezone but hasn't run the container
-  # as root.
+  # Warn if the user wants to change the locale but hasn't run the container as
+  # root.
   if [[ "$LANG" != "en_US.UTF-8" || ! -z "$LANGS" ]]; then
     echo "Container must be run as root to update or add locale"
   fi
@@ -77,7 +78,8 @@ else
     .local/share/code-server/User/settings.json.bak
   sed -i ':a;N;$!ba;s/,\n\}/\n}/g' \
     .local/share/code-server/User/settings.json.bak
-  jq -s '.[0] * .[1]' /var/tmp/settings.json \
+  jq -s '.[0] * .[1]' \
+    /var/tmp/skel/.local/share/code-server/User/settings.json \
     .local/share/code-server/User/settings.json.bak > \
     .local/share/code-server/User/settings.json
 fi
