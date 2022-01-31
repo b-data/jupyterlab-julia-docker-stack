@@ -111,7 +111,10 @@ RUN apt-get update \
   ## Clean up
   && cd / \
   && rm -rf /tmp/* \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* \
+  ## Install Tini
+  && curl -sL https://github.com/krallin/tini/releases/download/v0.19.0/tini-$(dpkg --print-architecture) -o /usr/local/bin/tini \
+  && chmod +x /usr/local/bin/tini
 
 ## Install code-server
 RUN mkdir /opt/code-server \
@@ -190,11 +193,8 @@ RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
   && chmod -R ugo+rx ${JULIA_DEPOT_PATH} \
   && unset JULIA_DEPOT_PATH \
   && mv $HOME/.local/share/jupyter/kernels/julia* /usr/local/share/jupyter/kernels/ \
+  ## Clean up
   && rm -rf $HOME/.local
-
-## Install Tini
-RUN curl -sL https://github.com/krallin/tini/releases/download/v0.19.0/tini-$(dpkg --print-architecture) -o /usr/local/bin/tini \
-  && chmod +x /usr/local/bin/tini
 
 ## Switch back to ${NB_USER} to avoid accidental container runs as root
 USER ${NB_USER}
@@ -208,6 +208,13 @@ WORKDIR ${HOME}
 
 RUN mkdir -p .local/share/code-server/User \
   && echo '{\n    "editor.tabSize": 2,\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "julia.enableCrashReporter": false,\n    "julia.enableTelemetry": false,\n    "julia.format.indent": 2,\n    "workbench.colorTheme": "Default Dark+",\n    "terminal.integrated.fontFamily": "MesloLGS NF"\n}' > .local/share/code-server/User/settings.json \
+  ## Install user-specific startup files for Julia REPL and IJulia
+  && mkdir -p .julia/config \
+  && echo 'Pkg.activate()\n\ntry\n    @eval using Revise\ncatch e\n    @warn(e.msg)\nend\n\nPkg.activate("$(ENV["HOME"])/.julia/environments/v$(VERSION.major).$(VERSION.minor)")' > \
+    .julia/config/startup_ijulia.jl \
+  && echo 'println("Executing user-specific startup file (", @__FILE__, ")...")\n\ntry\n    using Revise\n    println("Revise started")\ncatch\n    @warn("Could not load Revise")\nend\n\nPkg.activate("$(ENV["HOME"])/.julia/environments/v$(VERSION.major).$(VERSION.minor)")' > \
+    .julia/config/startup.jl \
+  ## Install Oh My Zsh with Powerlevel10k theme
   && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended \
   && git clone --depth=1 https://github.com/romkatv/powerlevel10k.git .oh-my-zsh/custom/themes/powerlevel10k \
   && sed -i 's/ZSH="\/home\/jovyan\/.oh-my-zsh"/ZSH="$HOME\/.oh-my-zsh"/g' .zshrc \
@@ -216,14 +223,14 @@ RUN mkdir -p .local/share/code-server/User \
   && echo "\n# set PATH so it includes user's private bin if it exists\nif [ -d "\$HOME/.local/bin" ] ; then\n    PATH="\$HOME/.local/bin:\$PATH"\nfi" | tee -a .bashrc .zshrc \
   && echo "\n# To customize prompt, run \`p10k configure\` or edit ~/.p10k.zsh." >> .zshrc \
   && echo "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh" >> .zshrc \
+  ## Create local copy of home directory
   && mkdir /var/tmp/skel \
   && cp -a $HOME/. /var/tmp/skel
 
 ## Copy local files as late as possible to avoid cache busting
 COPY assets/. /
 COPY scripts/. /
-COPY --chown=${NB_UID}:${NB_GID} .p10k.zsh ${HOME}/.p10k.zsh
-COPY --chown=${NB_UID}:${NB_GID} .p10k.zsh /var/tmp/skel/.p10k.zsh
+COPY --chown=${NB_UID}:${NB_GID} scripts/var/tmp/skel/.p10k.zsh ${HOME}/.p10k.zsh
 COPY startup.jl ${JULIA_PATH}/etc/julia/startup.jl
 
 EXPOSE 8888
