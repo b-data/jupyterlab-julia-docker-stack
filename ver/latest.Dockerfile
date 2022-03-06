@@ -146,13 +146,12 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
     jupyterhub==${JUPYTERHUB_VERSION} \
     jupyterlab==${JUPYTERLAB_VERSION} \
     jupyterlab-git \
+    jupyterlab-lsp \
     notebook \
     nbconvert \
+    python-lsp-server[all] \
   # Remove gcc and python3-dev
   && apt-get remove --purge -y $DEPS \
-  ## Set JupyterLab Dark theme
-  && mkdir -p /usr/local/share/jupyter/lab/settings \
-  && echo '{\n  "@jupyterlab/apputils-extension:themes": {\n    "theme": "JupyterLab Dark"\n  },\n  "@jupyterlab/terminal-extension:plugin": {\n    "fontFamily": "MesloLGS NF"\n  }\n}' > /usr/local/share/jupyter/lab/settings/overrides.json \
   ## Include custom fonts
   && sed -i 's|</head>|<link rel="preload" href="{{page_config.fullStaticUrl}}/assets/fonts/MesloLGS-NF-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
   && sed -i 's|</head>|<link rel="preload" href="{{page_config.fullStaticUrl}}/assets/fonts/MesloLGS-NF-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
@@ -189,7 +188,7 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
 
 ## Install the Julia kernel for JupyterLab
 RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
-  && julia -e "using Pkg; pkg\"add IJulia Revise\"; pkg\"precompile\"" \
+  && julia -e "using Pkg; pkg\"add IJulia Revise LanguageServer\"; pkg\"precompile\"" \
   && chmod -R ugo+rx ${JULIA_DEPOT_PATH} \
   && unset JULIA_DEPOT_PATH \
   && mv $HOME/.local/share/jupyter/kernels/julia* /usr/local/share/jupyter/kernels/ \
