@@ -16,7 +16,7 @@ ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG NB_GID=100
 ARG JUPYTERHUB_VERSION=2.2.2
-ARG JUPYTERLAB_VERSION=3.3.2
+ARG JUPYTERLAB_VERSION=3.3.3
 ARG CODE_SERVER_RELEASE=4.2.0
 ARG GIT_VERSION=2.35.1
 ARG GIT_LFS_VERSION=3.1.2
@@ -172,7 +172,7 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension mhutchie.git-graph \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension julialang.language-julia@1.6.15 \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension julialang.language-julia@1.6.17 \
   ## Create tmp folder for Jupyter extension
   && cd /opt/code-server/lib/vscode/extensions/ms-toolsai.jupyter-* \
   && mkdir -m 1777 tmp \
