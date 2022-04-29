@@ -1,0 +1,10 @@
+{
+    "editor.tabSize": 2,
+    "telemetry.enableTelemetry": false,
+    "gitlens.advanced.telemetry.enabled": false,
+    "julia.enableCrashReporter": false,
+    "julia.enableTelemetry": false,
+    "julia.format.indent": 2,
+    "workbench.colorTheme": "Default Dark+",
+    "terminal.integrated.fontFamily": "MesloLGS NF"
+}
