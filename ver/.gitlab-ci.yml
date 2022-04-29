@@ -18,7 +18,7 @@
     --password-stdin $CI_REGISTRY
   - >
     export VERSION_MAJ_MIN_PAT=`sed -n
-    "s|.*ver:\([[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\).*|\1|p"
+    "s|.*JULIA_VERSION=\([[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\).*|\1|p"
     ver/$CI_APP_TAG.Dockerfile`
     
     export VERSION_MAJ_MIN=`echo $VERSION_MAJ_MIN_PAT |
