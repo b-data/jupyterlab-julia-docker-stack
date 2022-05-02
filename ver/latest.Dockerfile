@@ -23,7 +23,8 @@ COPY conf/julia /files/${JULIA_PATH}
 COPY conf/user /files
 COPY scripts /files
 
-RUN chown -R ${NB_UID}:${NB_GID} /files/var/backup/skel \
+RUN find /files -type d -exec chmod 755 {} \; \
+  && chown -R ${NB_UID}:${NB_GID} /files/var/backup/skel \
   && chown root:root /files/var/backup/skel
 
 FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} as gsi
