@@ -36,11 +36,11 @@ if [ "$(id -u)" == 0 ] ; then
   # Install user-specific startup files for Julia REPL and IJulia
   su $NB_USER -c "mkdir -p .julia/config"
   if [[ ! -f ".julia/config/startup_ijulia.jl" ]]; then
-    su $NB_USER -c "cp -a /var/backup/skel/.julia/config/startup_ijulia.jl \
+    su $NB_USER -c "cp -a /var/backups/skel/.julia/config/startup_ijulia.jl \
       .julia/config/startup_ijulia.jl"
   fi
   if [[ ! -f ".julia/config/startup.jl" ]]; then
-    su $NB_USER -c "cp -a /var/backup/skel/.julia/config/startup.jl \
+    su $NB_USER -c "cp -a /var/backups/skel/.julia/config/startup.jl \
       .julia/config/startup.jl"
   fi
 
@@ -50,7 +50,7 @@ if [ "$(id -u)" == 0 ] ; then
   su $NB_USER -c "sed -i ':a;N;\$!ba;s/,\n\}/\n}/g' \
     .local/share/code-server/User/settings.json.bak"
   su $NB_USER -c "jq -s '.[0] * .[1]' \
-    /var/backup/skel/.local/share/code-server/User/settings.json \
+    /var/backups/skel/.local/share/code-server/User/settings.json \
     .local/share/code-server/User/settings.json.bak > \
     .local/share/code-server/User/settings.json"
 else
@@ -74,11 +74,11 @@ else
   # Install user-specific startup files for Julia REPL and IJulia
   mkdir -p .julia/config
   if [[ ! -f ".julia/config/startup_ijulia.jl" ]]; then
-    cp -a /var/backup/skel/.julia/config/startup_ijulia.jl \
+    cp -a /var/backups/skel/.julia/config/startup_ijulia.jl \
       .julia/config/startup_ijulia.jl
   fi
   if [[ ! -f ".julia/config/startup.jl" ]]; then
-    cp -a /var/backup/skel/.julia/config/startup.jl \
+    cp -a /var/backups/skel/.julia/config/startup.jl \
       .julia/config/startup.jl
   fi
 
@@ -88,7 +88,7 @@ else
   sed -i ':a;N;$!ba;s/,\n\}/\n}/g' \
     .local/share/code-server/User/settings.json.bak
   jq -s '.[0] * .[1]' \
-    /var/backup/skel/.local/share/code-server/User/settings.json \
+    /var/backups/skel/.local/share/code-server/User/settings.json \
     .local/share/code-server/User/settings.json.bak > \
     .local/share/code-server/User/settings.json
 fi
