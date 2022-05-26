@@ -1,9 +1,38 @@
 ARG BASE_IMAGE=debian:bullseye
-ARG GIT_VERSION=2.35.1
+ARG JULIA_VERSION=1.7.2
+
+ARG NB_USER=jovyan
+ARG NB_UID=1000
+ARG NB_GID=100
+ARG JUPYTERHUB_VERSION=2.3.0
+ARG JUPYTERLAB_VERSION=3.4.2
+ARG CODE_SERVER_RELEASE=4.4.0
+ARG GIT_VERSION=2.36.1
+ARG GIT_LFS_VERSION=3.1.4
+ARG PANDOC_VERSION=2.18
+
+FROM registry.gitlab.b-data.ch/julia/ver:${JULIA_VERSION} as files
+
+ARG NB_UID
+ARG NB_GID
+
+RUN mkdir /files
+
+COPY assets /files
+COPY conf/julia /files/${JULIA_PATH}
+COPY conf/user /files
+COPY scripts /files
+
+RUN chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
+  ## Ensure file modes are correct when using CI
+  ## Otherwise set to 777 in the target image
+  && find /files -type d -exec chmod 755 {} \; \
+  && find /files -type f -exec chmod 644 {} \; \
+  && find /files/usr/local/bin -type f -exec chmod 755 {} \;
 
 FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} as gsi
 
-FROM registry.gitlab.b-data.ch/julia/ver:1.7.2
+FROM registry.gitlab.b-data.ch/julia/ver:${JULIA_VERSION}
 
 LABEL org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.source="https://gitlab.b-data.ch/jupyterlab/julia/docker-stack" \
@@ -12,15 +41,16 @@ LABEL org.opencontainers.image.licenses="MIT" \
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-ARG NB_USER=jovyan
-ARG NB_UID=1000
-ARG NB_GID=100
-ARG JUPYTERHUB_VERSION=2.2.2
-ARG JUPYTERLAB_VERSION=3.3.2
-ARG CODE_SERVER_RELEASE=4.2.0
-ARG GIT_VERSION=2.35.1
-ARG GIT_LFS_VERSION=3.1.2
-ARG PANDOC_VERSION=2.17.1.1
+ARG NB_USER
+ARG NB_UID
+ARG NB_GID
+ARG JUPYTERHUB_VERSION
+ARG JUPYTERLAB_VERSION
+ARG CODE_SERVER_RELEASE
+ARG GIT_VERSION
+ARG GIT_LFS_VERSION
+ARG PANDOC_VERSION
+
 ARG CODE_WORKDIR
 
 ENV NB_USER=${NB_USER} \
@@ -43,9 +73,11 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     file \
     fontconfig \
     gnupg \
+    htop \
     info \
     jq \
     libclang-dev \
+    libpython3-dev \
     lsb-release \
     man-db \
     nano \
@@ -109,6 +141,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && rm pandoc-${PANDOC_VERSION}-1-${dpkgArch}.deb \
   ## Add user
   && useradd -m -s /bin/bash -N -u ${NB_UID} ${NB_USER} \
+  && mkdir -p /var/backups/skel \
+  && chown ${NB_UID}:${NB_GID} /var/backups/skel \
   ## Clean up
   && cd / \
   && rm -rf /tmp/* \
@@ -120,7 +154,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
 ## Install code-server
 RUN mkdir /opt/code-server \
   && cd /opt/code-server \
-  && curl -sL https://github.com/coder/code-server/releases/download/v${CODE_SERVER_RELEASE}/code-server-${CODE_SERVER_RELEASE}-linux-$(dpkg --print-architecture).tar.gz | tar zxf - --strip-components=1 \
+  && curl -sL https://github.com/coder/code-server/releases/download/v${CODE_SERVER_RELEASE}/code-server-${CODE_SERVER_RELEASE}-linux-$(dpkg --print-architecture).tar.gz | tar zxf - --no-same-owner --strip-components=1 \
   && curl -sL https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg -o vscode.svg \
   ## Include custom fonts
   && sed -i 's|</head>|	<link rel="preload" href="{{BASE}}/_static/src/browser/media/fonts/MesloLGS-NF-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">\n	</head>|g' /opt/code-server/lib/vscode/out/vs/code/browser/workbench/workbench.html \
@@ -160,19 +194,19 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions \
   && sed -i 's|</head>|<link rel="stylesheet" type="text/css" href="{{page_config.fullStaticUrl}}/assets/css/fonts.css"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
   ## Install code-server extensions
   && cd /tmp \
-  && curl -sLO https://dl.b-data.ch/vsix/alefragnani.project-manager-12.5.0.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-12.5.0.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/alefragnani.project-manager-12.6.0.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-12.6.0.vsix \
   && curl -sLO https://dl.b-data.ch/vsix/piotrpalarz.vscode-gitignore-generator-1.0.3.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator-1.0.3.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-toolsai.jupyter@2022.2.1010641114 \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python@2022.2.1924087327 \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension mhutchie.git-graph \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension julialang.language-julia@1.6.8 \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension julialang.language-julia@1.6.17 \
   ## Create tmp folder for Jupyter extension
   && cd /opt/code-server/lib/vscode/extensions/ms-toolsai.jupyter-* \
   && mkdir -m 1777 tmp \
@@ -210,32 +244,23 @@ ENV HOME=/home/${NB_USER} \
 
 WORKDIR ${HOME}
 
-RUN mkdir -p .local/share/code-server/User \
-  && echo '{\n    "editor.tabSize": 2,\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "julia.enableCrashReporter": false,\n    "julia.enableTelemetry": false,\n    "julia.format.indent": 2,\n    "workbench.colorTheme": "Default Dark+",\n    "terminal.integrated.fontFamily": "MesloLGS NF"\n}' > .local/share/code-server/User/settings.json \
-  ## Install user-specific startup files for Julia REPL and IJulia
-  && mkdir -p .julia/config \
-  && echo 'Pkg.activate()\n\ntry\n    @eval using Revise\ncatch e\n    @warn(e.msg)\nend\n\nPkg.activate("$(ENV["HOME"])/.julia/environments/v$(VERSION.major).$(VERSION.minor)")' > \
-    .julia/config/startup_ijulia.jl \
-  && echo 'println("Executing user-specific startup file (", @__FILE__, ")...")\n\ntry\n    using Revise\n    println("Revise started")\ncatch\n    @warn("Could not load Revise")\nend\n\nPkg.activate("$(ENV["HOME"])/.julia/environments/v$(VERSION.major).$(VERSION.minor)")' > \
-    .julia/config/startup.jl \
-  ## Install Oh My Zsh with Powerlevel10k theme
-  && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended \
+## Install Oh My Zsh with Powerlevel10k theme
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended \
   && git clone --depth=1 https://github.com/romkatv/powerlevel10k.git .oh-my-zsh/custom/themes/powerlevel10k \
   && sed -i 's/ZSH="\/home\/jovyan\/.oh-my-zsh"/ZSH="$HOME\/.oh-my-zsh"/g' .zshrc \
   && sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="powerlevel10k\/powerlevel10k"/g' .zshrc \
-  && echo "\n# set PATH so it includes user's private bin if it exists\nif [ -d "\$HOME/bin" ] ; then\n    PATH="\$HOME/bin:\$PATH"\nfi" | tee -a .bashrc .zshrc \
-  && echo "\n# set PATH so it includes user's private bin if it exists\nif [ -d "\$HOME/.local/bin" ] ; then\n    PATH="\$HOME/.local/bin:\$PATH"\nfi" | tee -a .bashrc .zshrc \
+  && echo "\n# set PATH so it includes user's private bin if it exists\nif [ -d \"\$HOME/bin\" ] ; then\n    PATH=\"\$HOME/bin:\$PATH\"\nfi" >> .zshrc \
+  && echo "\n# set PATH so it includes user's private bin if it exists\nif [ -d \"\$HOME/.local/bin\" ] ; then\n    PATH=\"\$HOME/.local/bin:\$PATH\"\nfi" >> .zshrc \
+  && echo "\n# Update last-activity timestamps while in screen/tmux session\nif [ ! -z \"\$TMUX\" -o ! -z \"\$STY\" ] ; then\n    busy &\nfi" >> .bashrc \
+  && echo "\n# Update last-activity timestamps while in screen/tmux session\nif [ ! -z \"\$TMUX\" -o ! -z \"\$STY\" ] ; then\n    setopt nocheckjobs\n    busy &\nfi" >> .zshrc \
   && echo "\n# To customize prompt, run \`p10k configure\` or edit ~/.p10k.zsh." >> .zshrc \
   && echo "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh" >> .zshrc \
-  ## Create local copy of home directory
-  && mkdir /var/tmp/skel \
-  && cp -a $HOME/. /var/tmp/skel
+  ## Create backup of home directory
+  && cp -a $HOME/. /var/backups/skel
 
-## Copy local files as late as possible to avoid cache busting
-COPY assets/. /
-COPY scripts/. /
-COPY --chown=${NB_UID}:${NB_GID} scripts/var/tmp/skel/.p10k.zsh ${HOME}/.p10k.zsh
-COPY startup.jl ${JULIA_PATH}/etc/julia/startup.jl
+## Copy files as late as possible to avoid cache busting
+COPY --from=files /files /
+COPY --from=files /files/var/backups/skel ${HOME}
 
 EXPOSE 8888
 
