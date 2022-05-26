@@ -1,5 +1,5 @@
 ARG BASE_IMAGE=debian:bullseye
-ARG JULIA_VERSION=1.7.2
+ARG JULIA_VERSION=1.7.3
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
@@ -8,7 +8,7 @@ ARG JUPYTERHUB_VERSION=2.3.0
 ARG JUPYTERLAB_VERSION=3.4.2
 ARG CODE_SERVER_RELEASE=4.4.0
 ARG GIT_VERSION=2.36.1
-ARG GIT_LFS_VERSION=3.1.4
+ARG GIT_LFS_VERSION=3.2.0
 ARG PANDOC_VERSION=2.18
 
 FROM registry.gitlab.b-data.ch/julia/ver:${JULIA_VERSION} as files
@@ -113,15 +113,15 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   ## Install Git LFS
   && cd /tmp \
   && curl -sSLO https://github.com/git-lfs/git-lfs/releases/download/v${GIT_LFS_VERSION}/git-lfs-linux-${dpkgArch}-v${GIT_LFS_VERSION}.tar.gz \
-  && tar xfz git-lfs-linux-${dpkgArch}-v${GIT_LFS_VERSION}.tar.gz --no-same-owner --one-top-level \
-  && cd git-lfs-linux-${dpkgArch}-v${GIT_LFS_VERSION} \
+  && tar xfz git-lfs-linux-${dpkgArch}-v${GIT_LFS_VERSION}.tar.gz --no-same-owner \
+  && cd git-lfs-${GIT_LFS_VERSION} \
   && sed -i "s/git lfs install/#git lfs install/g" install.sh \
   && echo '\n\
     mkdir -p $prefix/share/man/man1\n\
     rm -rf $prefix/share/man/man1/git-lfs*\n\
     \n\
-    pushd "$( dirname "${BASH_SOURCE[0]}" )/man" > /dev/null\n\
-      for g in *.1; do\n\
+    pushd "$( dirname "${BASH_SOURCE[0]}" )/man/man1" > /dev/null\n\
+      for g in git-lfs*; do\n\
         install -m0644 $g "$prefix/share/man/man1/$g"\n\
       done\n\
     popd > /dev/null\n\
@@ -129,8 +129,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     mkdir -p $prefix/share/man/man5\n\
     rm -rf $prefix/share/man/man5/git-lfs*\n\
     \n\
-    pushd "$( dirname "${BASH_SOURCE[0]}" )/man" > /dev/null\n\
-      for g in *.5; do\n\
+    pushd "$( dirname "${BASH_SOURCE[0]}" )/man/man5" > /dev/null\n\
+      for g in git-lfs*; do\n\
         install -m0644 $g "$prefix/share/man/man5/$g"\n\
       done\n\
     popd > /dev/null' >> install.sh \
