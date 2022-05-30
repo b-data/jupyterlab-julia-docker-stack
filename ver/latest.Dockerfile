@@ -6,6 +6,7 @@ ARG NB_UID=1000
 ARG NB_GID=100
 ARG JUPYTERHUB_VERSION=2.3.0
 ARG JUPYTERLAB_VERSION=3.4.2
+ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
 ARG CODE_SERVER_RELEASE=4.4.0
 ARG GIT_VERSION=2.36.1
 ARG GIT_LFS_VERSION=3.2.0
@@ -31,6 +32,7 @@ RUN chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
   && find /files/usr/local/bin -type f -exec chmod 755 {} \;
 
 FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} as gsi
+FROM registry.gitlab.b-data.ch/git-lfs/glfsi:${GIT_LFS_VERSION} as glfsi
 
 FROM registry.gitlab.b-data.ch/julia/ver:${JULIA_VERSION}
 
@@ -46,6 +48,7 @@ ARG NB_UID
 ARG NB_GID
 ARG JUPYTERHUB_VERSION
 ARG JUPYTERLAB_VERSION
+ARG CODE_BUILTIN_EXTENSIONS_DIR
 ARG CODE_SERVER_RELEASE
 ARG GIT_VERSION
 ARG GIT_LFS_VERSION
@@ -63,28 +66,30 @@ ENV NB_USER=${NB_USER} \
     GIT_LFS_VERSION=${GIT_LFS_VERSION} \
     PANDOC_VERSION=${PANDOC_VERSION}
 
+## Install Git
 COPY --from=gsi /usr/local /usr/local
+## Install Git LFS
+COPY --from=glfsi /usr/local /usr/local
 
 USER root
 
 RUN dpkgArch="$(dpkg --print-architecture)" \
   && apt-get update \
   && apt-get -y install --no-install-recommends \
+    curl \
     file \
     fontconfig \
+    gcc \
     gnupg \
     htop \
     info \
     jq \
     libclang-dev \
-    libpython3-dev \
     lsb-release \
     man-db \
     nano \
     procps \
     psmisc \
-    python3-venv \
-    python3-virtualenv \
     screen \
     sudo \
     tmux \
@@ -97,6 +102,24 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     ## Additional git runtime recommendations
     less \
     ssh-client \
+  && if [ -z "$PYTHON_VERSION" ]; then \
+    apt-get -y install --no-install-recommends \
+      ## Additional python-dev dependencies
+      python3-dev \
+      python3-distutils; \
+    ## make some useful symlinks that are expected to exist
+    ## ("/usr/bin/python" and friends)
+	  for src in idle3 pydoc3 python3 python3-config; do \
+		  dst="$(echo "$src" | tr -d 3)"; \
+		  [ -s "/usr/bin/$src" ]; \
+		  [ ! -e "/usr/bin/$dst" ]; \
+		  ln -svT "$src" "/usr/bin/$dst"; \
+	  done; \
+  fi \
+  ## Install pip
+  && curl -sLO https://bootstrap.pypa.io/get-pip.py \
+  && python3 get-pip.py \
+  && rm get-pip.py \
   ## Install font MesloLGS NF
   && mkdir -p /usr/share/fonts/truetype/meslo \
   && curl -sL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf -o /usr/share/fonts/truetype/meslo/MesloLGS\ NF\ Regular.ttf \
@@ -110,31 +133,6 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && git config --system credential.helper "cache --timeout=3600" \
   ## Merge the default branch from the default remote when "git pull" is run
   && sudo git config --system pull.rebase false \
-  ## Install Git LFS
-  && cd /tmp \
-  && curl -sSLO https://github.com/git-lfs/git-lfs/releases/download/v${GIT_LFS_VERSION}/git-lfs-linux-${dpkgArch}-v${GIT_LFS_VERSION}.tar.gz \
-  && tar xfz git-lfs-linux-${dpkgArch}-v${GIT_LFS_VERSION}.tar.gz --no-same-owner \
-  && cd git-lfs-${GIT_LFS_VERSION} \
-  && sed -i "s/git lfs install/#git lfs install/g" install.sh \
-  && echo '\n\
-    mkdir -p $prefix/share/man/man1\n\
-    rm -rf $prefix/share/man/man1/git-lfs*\n\
-    \n\
-    pushd "$( dirname "${BASH_SOURCE[0]}" )/man/man1" > /dev/null\n\
-      for g in git-lfs*; do\n\
-        install -m0644 $g "$prefix/share/man/man1/$g"\n\
-      done\n\
-    popd > /dev/null\n\
-    \n\
-    mkdir -p $prefix/share/man/man5\n\
-    rm -rf $prefix/share/man/man5/git-lfs*\n\
-    \n\
-    pushd "$( dirname "${BASH_SOURCE[0]}" )/man/man5" > /dev/null\n\
-      for g in git-lfs*; do\n\
-        install -m0644 $g "$prefix/share/man/man5/$g"\n\
-      done\n\
-    popd > /dev/null' >> install.sh \
-  && ./install.sh \
   ## Install pandoc
   && curl -sLO https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-${dpkgArch}.deb \
   && dpkg -i pandoc-${PANDOC_VERSION}-1-${dpkgArch}.deb \
@@ -143,13 +141,15 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && useradd -m -s /bin/bash -N -u ${NB_UID} ${NB_USER} \
   && mkdir -p /var/backups/skel \
   && chown ${NB_UID}:${NB_GID} /var/backups/skel \
-  ## Clean up
-  && cd / \
-  && rm -rf /tmp/* \
-  && rm -rf /var/lib/apt/lists/* \
   ## Install Tini
   && curl -sL https://github.com/krallin/tini/releases/download/v0.19.0/tini-${dpkgArch} -o /usr/local/bin/tini \
-  && chmod +x /usr/local/bin/tini
+  && chmod +x /usr/local/bin/tini \
+  ## Clean up
+  && rm -rf /tmp/* \
+  && rm -rf /var/lib/apt/lists/* \
+    $HOME/.cache
+
+ENV PATH=/opt/code-server/bin:$PATH
 
 ## Install code-server
 RUN mkdir /opt/code-server \
@@ -161,37 +161,7 @@ RUN mkdir /opt/code-server \
   && sed -i 's|</head>|	<link rel="preload" href="{{BASE}}/_static/src/browser/media/fonts/MesloLGS-NF-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">\n	</head>|g' /opt/code-server/lib/vscode/out/vs/code/browser/workbench/workbench.html \
   && sed -i 's|</head>|	<link rel="preload" href="{{BASE}}/_static/src/browser/media/fonts/MesloLGS-NF-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">\n	</head>|g' /opt/code-server/lib/vscode/out/vs/code/browser/workbench/workbench.html \
   && sed -i 's|</head>|	<link rel="preload" href="{{BASE}}/_static/src/browser/media/fonts/MesloLGS-NF-Bold-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">\n	</head>|g' /opt/code-server/lib/vscode/out/vs/code/browser/workbench/workbench.html \
-  && sed -i 's|</head>|	<link rel="stylesheet" type="text/css" href="{{BASE}}/_static/src/browser/media/css/fonts.css">\n	</head>|g' /opt/code-server/lib/vscode/out/vs/code/browser/workbench/workbench.html
-
-ENV PATH=/opt/code-server/bin:$PATH
-
-## Install JupyterLab
-RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions \
-  && curl -sLO https://bootstrap.pypa.io/get-pip.py \
-  && python3 get-pip.py \
-  && rm get-pip.py \
-  ## Install gcc and python3-dev to build wheels
-  && DEPS="gcc python3-dev" \
-  && apt-get update \
-  && apt-get install -y --no-install-recommends $DEPS \
-  ## Install Python packages
-  && pip3 install \
-    jupyter-server-proxy \
-    jupyterhub==${JUPYTERHUB_VERSION} \
-    jupyterlab==${JUPYTERLAB_VERSION} \
-    jupyterlab-git \
-    jupyterlab-lsp \
-    notebook \
-    nbconvert \
-    python-lsp-server[all] \
-  # Remove gcc and python3-dev
-  && apt-get remove --purge -y $DEPS \
-  ## Include custom fonts
-  && sed -i 's|</head>|<link rel="preload" href="{{page_config.fullStaticUrl}}/assets/fonts/MesloLGS-NF-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
-  && sed -i 's|</head>|<link rel="preload" href="{{page_config.fullStaticUrl}}/assets/fonts/MesloLGS-NF-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
-  && sed -i 's|</head>|<link rel="preload" href="{{page_config.fullStaticUrl}}/assets/fonts/MesloLGS-NF-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
-  && sed -i 's|</head>|<link rel="preload" href="{{page_config.fullStaticUrl}}/assets/fonts/MesloLGS-NF-Bold-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
-  && sed -i 's|</head>|<link rel="stylesheet" type="text/css" href="{{page_config.fullStaticUrl}}/assets/css/fonts.css"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
+  && sed -i 's|</head>|	<link rel="stylesheet" type="text/css" href="{{BASE}}/_static/src/browser/media/css/fonts.css">\n	</head>|g' /opt/code-server/lib/vscode/out/vs/code/browser/workbench/workbench.html \
   ## Install code-server extensions
   && cd /tmp \
   && curl -sLO https://dl.b-data.ch/vsix/alefragnani.project-manager-12.6.0.vsix \
@@ -206,23 +176,38 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension mhutchie.git-graph \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension julialang.language-julia@1.6.17 \
   ## Create tmp folder for Jupyter extension
   && cd /opt/code-server/lib/vscode/extensions/ms-toolsai.jupyter-* \
   && mkdir -m 1777 tmp \
-  ## Create folders for JupyterLab hook scripts
-  && mkdir -p /usr/local/bin/start-notebook.d \
-  && mkdir -p /usr/local/bin/before-notebook.d \
   ## Clean up
   && rm -rf /tmp/* \
-  && apt-get autoremove -y \
-  && rm -rf /var/lib/apt/lists/* \
-    /root/.cache \
-    /root/.config \
-    /root/.vscode-remote
+    $HOME/.config \
+    $HOME/.local
 
-## Install the Julia kernel for JupyterLab
+## Install JupyterLab
+RUN pip3 install \
+    jupyter-server-proxy \
+    jupyterhub==${JUPYTERHUB_VERSION} \
+    jupyterlab==${JUPYTERLAB_VERSION} \
+    jupyterlab-git \
+    jupyterlab-lsp \
+    notebook \
+    nbconvert \
+    python-lsp-server[all] \
+    virtualenv \
+  ## Include custom fonts
+  && sed -i 's|</head>|<link rel="preload" href="{{page_config.fullStaticUrl}}/assets/fonts/MesloLGS-NF-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
+  && sed -i 's|</head>|<link rel="preload" href="{{page_config.fullStaticUrl}}/assets/fonts/MesloLGS-NF-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
+  && sed -i 's|</head>|<link rel="preload" href="{{page_config.fullStaticUrl}}/assets/fonts/MesloLGS-NF-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
+  && sed -i 's|</head>|<link rel="preload" href="{{page_config.fullStaticUrl}}/assets/fonts/MesloLGS-NF-Bold-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
+  && sed -i 's|</head>|<link rel="stylesheet" type="text/css" href="{{page_config.fullStaticUrl}}/assets/css/fonts.css"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
+  ## Clean up
+  && rm -rf /tmp/* \
+    $HOME/.cache
+
+## Install Julia related stuff
 RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
+  ## Install the Julia kernel for JupyterLab
   && julia -e "using Pkg; pkg\"add IJulia Revise LanguageServer\"; pkg\"precompile\"" \
   && chmod -R ugo+rx ${JULIA_DEPOT_PATH} \
   && unset JULIA_DEPOT_PATH \
@@ -231,8 +216,15 @@ RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
   && s3f=$(ls /opt/julia/local/share/julia/packages/SymbolServer) \
   && cd /opt/julia/local/share/julia/packages/SymbolServer/${s3f} \
   && chmod 777 store \
+  ## Install code-server extension
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension julialang.language-julia@1.6.17 \
   ## Clean up
-  && rm -rf $HOME/.local
+  && rm -rf /tmp/* \
+    /var/lib/apt/lists/* \
+    $HOME/.cache \
+    $HOME/.config \
+    $HOME/.ipython \
+    $HOME/.local
 
 ## Switch back to ${NB_USER} to avoid accidental container runs as root
 USER ${NB_USER}
