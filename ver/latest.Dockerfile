@@ -4,7 +4,7 @@ ARG JULIA_VERSION=1.7.3
 ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG NB_GID=100
-ARG JUPYTERHUB_VERSION=2.3.0
+ARG JUPYTERHUB_VERSION=2.3.1
 ARG JUPYTERLAB_VERSION=3.4.2
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
 ARG CODE_SERVER_RELEASE=4.4.0
@@ -76,13 +76,18 @@ USER root
 RUN dpkgArch="$(dpkg --print-architecture)" \
   && apt-get update \
   && apt-get -y install --no-install-recommends \
+    bash-completion \
+    build-essential \
     curl \
     file \
     fontconfig \
+    g++ \
     gcc \
+    gfortran \
     gnupg \
     htop \
     info \
+    inkscape \
     jq \
     libclang-dev \
     lsb-release \
@@ -102,9 +107,9 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     ## Additional git runtime recommendations
     less \
     ssh-client \
+  ## Additional python-dev dependencies
   && if [ -z "$PYTHON_VERSION" ]; then \
     apt-get -y install --no-install-recommends \
-      ## Additional python-dev dependencies
       python3-dev \
       python3-distutils; \
     ## make some useful symlinks that are expected to exist
@@ -118,7 +123,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   fi \
   ## Install/update pip, setuptools and wheel
   && curl -sLO https://bootstrap.pypa.io/get-pip.py \
-  && python3 get-pip.py \
+  && python get-pip.py \
     pip \
     setuptools \
     wheel \
@@ -188,7 +193,7 @@ RUN mkdir /opt/code-server \
     $HOME/.local
 
 ## Install JupyterLab
-RUN pip3 install \
+RUN pip install \
     jupyter-server-proxy \
     jupyterhub==${JUPYTERHUB_VERSION} \
     jupyterlab==${JUPYTERLAB_VERSION} \
@@ -197,7 +202,6 @@ RUN pip3 install \
     notebook \
     nbconvert \
     python-lsp-server[all] \
-    virtualenv \
   ## Include custom fonts
   && sed -i 's|</head>|<link rel="preload" href="{{page_config.fullStaticUrl}}/assets/fonts/MesloLGS-NF-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
   && sed -i 's|</head>|<link rel="preload" href="{{page_config.fullStaticUrl}}/assets/fonts/MesloLGS-NF-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
