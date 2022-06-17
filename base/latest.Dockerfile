@@ -215,14 +215,15 @@ RUN pip install \
 ## Install Julia related stuff
 RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
   ## Install the Julia kernel for JupyterLab
-  && julia -e "using Pkg; pkg\"add IJulia Revise LanguageServer\"; pkg\"precompile\"" \
+  && julia -e 'using Pkg; Pkg.add(["IJulia", "Revise", "LanguageServer"]); Pkg.precompile()' \
+  && julia -e 'using Pkg; Pkg.add(readdir("$(ENV["JULIA_DEPOT_PATH"])/packages"))' \
   && chmod -R ugo+rx ${JULIA_DEPOT_PATH} \
-  && unset JULIA_DEPOT_PATH \
   && mv $HOME/.local/share/jupyter/kernels/julia* /usr/local/share/jupyter/kernels/ \
   ## SymbolServer: Change permissions on store folder
-  && s3f=$(ls /opt/julia/local/share/julia/packages/SymbolServer) \
-  && cd /opt/julia/local/share/julia/packages/SymbolServer/${s3f} \
+  && s3f=$(ls $JULIA_DEPOT_PATH/packages/SymbolServer) \
+  && cd ${JULIA_DEPOT_PATH}/packages/SymbolServer/${s3f} \
   && chmod 777 store \
+  && unset JULIA_DEPOT_PATH \
   ## Install code-server extension
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension julialang.language-julia@1.6.17 \
   ## Clean up
