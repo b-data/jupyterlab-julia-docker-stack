@@ -228,7 +228,7 @@ RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
   && chmod 777 store \
   && unset JULIA_DEPOT_PATH \
   ## Install code-server extension
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension julialang.language-julia@1.6.24 \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension julialang.language-julia@1.6.28 \
   ## Clean up
   && rm -rf /tmp/* \
     /var/lib/apt/lists/* \
