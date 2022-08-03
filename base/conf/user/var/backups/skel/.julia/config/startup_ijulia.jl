@@ -1,13 +1,3 @@
-Pkg.activate()
-
-try
-    @eval using Revise
-catch e
-    @warn "Error initializing Revise" exception=(e, catch_backtrace())
-end
-
-if isfile("Project.toml") && isfile("Manifest.toml")
-    Pkg.activate(".")
-else
-    Pkg.activate("$(ENV["HOME"])/.julia/environments/v$(VERSION.major).$(VERSION.minor)")
+if !in(MIME("application/pdf"), IJulia.ijulia_mime_types)
+    IJulia.register_mime(MIME("application/pdf"))
 end
