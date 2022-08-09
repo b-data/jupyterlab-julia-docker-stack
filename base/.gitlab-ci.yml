@@ -209,3 +209,29 @@ build-manifest:version-linux-multiarch:
     - if: $CI_COMMIT_BRANCH == "freeze-version"
       changes:
         - base/$JULIA_VERSION.Dockerfile
+
+trigger-latest-build:
+  extends: .build
+  stage: .post
+  before_script:
+    - apk upgrade --no-cache
+    - apk add --update --no-cache curl
+  script:
+    - curl -X POST -F token=$JUPYTERLAB_JULIA_PUBTOOLS -F ref=master https://gitlab.b-data.ch/api/v4/projects/295/trigger/pipeline
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+      changes:
+        - base/latest.Dockerfile
+
+trigger-version-build:
+  extends: .build
+  stage: .post
+  before_script:
+    - apk upgrade --no-cache
+    - apk add --update --no-cache curl
+  script:
+    - curl -X POST -F token=$JUPYTERLAB_JULIA_PUBTOOLS -F ref=freeze-version https://gitlab.b-data.ch/api/v4/projects/295/trigger/pipeline
+  rules:
+    - if: $CI_COMMIT_BRANCH == "freeze-version"
+      changes:
+        - base/$JULIA_VERSION.Dockerfile
