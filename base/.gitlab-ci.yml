@@ -33,7 +33,7 @@
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: "/certs"
-    JULIA_VERSION: "1.7.3"
+    JULIA_VERSION: "1.8.0"
   before_script:
     - *before-script-build
 
