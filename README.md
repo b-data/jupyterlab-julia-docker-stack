@@ -99,18 +99,27 @@ For `<major>.<minor>.<patch>` ≥ `1.7.3`.
 self built:
 
 ```bash
-docker run --rm -ti jupyterlab-julia-base[:<major>.<minor>.<patch>]
+docker run -it --rm \
+  -p 8888:8888 \
+  -v $PWD:/home/jovyan \
+  jupyterlab-julia-base[:<major>.<minor>.<patch>]
 ```
 
 from the project's GitLab Container Registries:
 
 *  [jupyterlab/julia/base](https://gitlab.b-data.ch/jupyterlab/julia/base/container_registry)  
     ```bash
-    docker run -it --rm -p 8888:8888 -v $PWD:/home/jovyan registry.gitlab.b-data.ch/jupyterlab/julia/base[:<major>[.<minor>[.<patch>]]]
+    docker run -it --rm \
+      -p 8888:8888 \
+      -v $PWD:/home/jovyan \
+      registry.gitlab.b-data.ch/jupyterlab/julia/base[:<major>[.<minor>[.<patch>]]]
     ```
 *  [jupyterlab/julia/pubtools](https://gitlab.b-data.ch/jupyterlab/julia/pubtools/container_registry)
     ```bash
-    docker run -it --rm -p 8888:8888 -v $PWD:/home/jovyan registry.gitlab.b-data.ch/jupyterlab/julia/pubtools[:<major>[.<minor>[.<patch>]]]
+    docker run -it --rm \
+      -p 8888:8888 \
+      -v $PWD:/home/jovyan \
+      registry.gitlab.b-data.ch/jupyterlab/julia/pubtools[:<major>[.<minor>[.<patch>]]]
     ```
 
 The use of the `-v` flag in the command mounts the current working directory on
