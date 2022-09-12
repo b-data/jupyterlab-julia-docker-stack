@@ -5,6 +5,7 @@
 Pre-built multi-arch (`linux/amd64`, `linux/arm64/v8`) docker images:
 
 *  `registry.gitlab.b-data.ch/jupyterlab/julia/base`
+    *  `registry.gitlab.b-data.ch/jupyterlab/julia/ver` (1.5.4 ≤ version < 1.7.3)
 *  `registry.gitlab.b-data.ch/jupyterlab/julia/pubtools`
 
 Images considered stable for Julia versions ≥ 1.7.3.  
