@@ -2,15 +2,17 @@
 
 # JupyterLab Julia docker stack
 
-Pre-built multi-arch (`linux/amd64`, `linux/arm64/v8`) docker images:
+Multi-arch (`linux/amd64`, `linux/arm64/v8`) docker images:
 
-*  `registry.gitlab.b-data.ch/jupyterlab/julia/base`
-    *  `registry.gitlab.b-data.ch/jupyterlab/julia/ver` (1.5.4 ≤ version < 1.7.3)
-*  `registry.gitlab.b-data.ch/jupyterlab/julia/pubtools`
+*  [`registry.gitlab.b-data.ch/jupyterlab/julia/base`](https://gitlab.b-data.ch/jupyterlab/julia/base/container_registry)
+    *  [`registry.gitlab.b-data.ch/jupyterlab/julia/ver`](https://gitlab.b-data.ch/jupyterlab/julia/ver/container_registry) (1.5.4 ≤ version < 1.7.3)
+*  [`registry.gitlab.b-data.ch/jupyterlab/julia/pubtools`](https://gitlab.b-data.ch/jupyterlab/julia/pubtools/container_registry)
 
 Images considered stable for Julia versions ≥ 1.7.3.  
 :point_right: The current state may eventually be backported to versions ≥
 1.5.4.
+
+:microscope: Check out `jupyterlab/julia/pubtools` at https://demo.jupyter.b-data.ch.
 
 **Features**
 
@@ -20,13 +22,13 @@ Images considered stable for Julia versions ≥ 1.7.3.
        branding/telemetry/licensing.
     *  **Git**: A distributed version-control system for tracking changes in
        source code.
+    *  **Git LFS**: A Git extension for versioning large files.
     *  **Julia**: A high-level, high-performance dynamic language for technical
        computing.
     *  **Pandoc**: A universal markup converter.
     *  **Python**: An interpreted, object-oriented, high-level programming
        language with dynamic semantics.
-    *  **Quarto**: An open-source scientific and technical publishing system
-       built on Pandoc.  
+    *  **Quarto**: A scientific and technical publishing system built on Pandoc.  
        :information_source: pubtools image, amd64 only
     *  **TinyTeX**: A lightweight, cross-platform, portable, and
        easy-to-maintain LaTeX distribution based on TeX Live.  
@@ -108,14 +110,14 @@ docker run -it --rm \
 
 from the project's GitLab Container Registries:
 
-*  [jupyterlab/julia/base](https://gitlab.b-data.ch/jupyterlab/julia/base/container_registry)  
+*  [`jupyterlab/julia/base`](https://gitlab.b-data.ch/jupyterlab/julia/base/container_registry)  
     ```bash
     docker run -it --rm \
       -p 8888:8888 \
       -v $PWD:/home/jovyan \
       registry.gitlab.b-data.ch/jupyterlab/julia/base[:<major>[.<minor>[.<patch>]]]
     ```
-*  [jupyterlab/julia/pubtools](https://gitlab.b-data.ch/jupyterlab/julia/pubtools/container_registry)
+*  [`jupyterlab/julia/pubtools`](https://gitlab.b-data.ch/jupyterlab/julia/pubtools/container_registry)
     ```bash
     docker run -it --rm \
       -p 8888:8888 \
