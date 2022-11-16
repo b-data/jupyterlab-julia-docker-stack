@@ -1,5 +1,5 @@
 ARG BASE_IMAGE=debian:bullseye
-ARG PARENT_IMAGE=registry.gitlab.b-data.ch/julia/ver
+ARG BUILD_ON_IMAGE=registry.gitlab.b-data.ch/julia/ver
 ARG JULIA_VERSION=1.8.1
 
 ARG NB_USER=jovyan
@@ -13,7 +13,7 @@ ARG GIT_VERSION=2.37.3
 ARG GIT_LFS_VERSION=3.2.0
 ARG PANDOC_VERSION=2.19.2
 
-FROM ${PARENT_IMAGE}:${JULIA_VERSION} as files
+FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION} as files
 
 ARG NB_UID
 ARG NB_GID
@@ -35,7 +35,7 @@ RUN chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
 FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} as gsi
 FROM registry.gitlab.b-data.ch/git-lfs/glfsi:${GIT_LFS_VERSION} as glfsi
 
-FROM ${PARENT_IMAGE}:${JULIA_VERSION}
+FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}
 
 LABEL org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.source="https://gitlab.b-data.ch/jupyterlab/julia/docker-stack" \
