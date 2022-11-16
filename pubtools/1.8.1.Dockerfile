@@ -1,10 +1,10 @@
-ARG BUILD_ON_IMAGE=registry.gitlab.b-data.ch/jupyterlab/julia/base
+ARG PARENT_IMAGE=registry.gitlab.b-data.ch/jupyterlab/julia/base
 ARG JULIA_VERSION=1.8.1
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
 ARG QUARTO_VERSION=1.1.251
 ARG CTAN_REPO=https://www.texlive.info/tlnet-archive/2022/09/29/tlnet
 
-FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}
+FROM ${PARENT_IMAGE}:${JULIA_VERSION}
 
 ARG DEBIAN_FRONTEND=noninteractive
 
