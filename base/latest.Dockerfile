@@ -1,22 +1,22 @@
-ARG BASE_IMAGE=debian:bullseye
+ARG BASE_IMAGE=debian
+ARG BASE_IMAGE_TAG=bullseye
 ARG BUILD_ON_IMAGE=registry.gitlab.b-data.ch/julia/ver
 ARG JULIA_VERSION
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
-ARG NB_GID=100
 ARG JUPYTERHUB_VERSION=2.3.1
-ARG JUPYTERLAB_VERSION=3.4.7
+ARG JUPYTERLAB_VERSION=3.5.0
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_RELEASE=4.7.0
-ARG GIT_VERSION=2.37.3
+ARG CODE_SERVER_VERSION=4.8.3
+ARG GIT_VERSION=2.38.1
 ARG GIT_LFS_VERSION=3.2.0
 ARG PANDOC_VERSION=2.19.2
 
 FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION} as files
 
 ARG NB_UID
-ARG NB_GID
+ENV NB_GID=100
 
 RUN mkdir /files
 
@@ -32,7 +32,7 @@ RUN chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
   && find /files -type f -exec chmod 644 {} \; \
   && find /files/usr/local/bin -type f -exec chmod 755 {} \;
 
-FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} as gsi
+FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} as gsi
 FROM registry.gitlab.b-data.ch/git-lfs/glfsi:${GIT_LFS_VERSION} as glfsi
 
 FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}
@@ -44,25 +44,26 @@ LABEL org.opencontainers.image.licenses="MIT" \
 
 ARG DEBIAN_FRONTEND=noninteractive
 
+ARG BUILD_ON_IMAGE
 ARG NB_USER
 ARG NB_UID
-ARG NB_GID
 ARG JUPYTERHUB_VERSION
 ARG JUPYTERLAB_VERSION
 ARG CODE_BUILTIN_EXTENSIONS_DIR
-ARG CODE_SERVER_RELEASE
+ARG CODE_SERVER_VERSION
 ARG GIT_VERSION
 ARG GIT_LFS_VERSION
 ARG PANDOC_VERSION
 
 ARG CODE_WORKDIR
 
-ENV NB_USER=${NB_USER} \
+ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${JULIA_VERSION} \
+    NB_USER=${NB_USER} \
     NB_UID=${NB_UID} \
-    NB_GID=${NB_GID} \
+    NB_GID=100 \
     JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION} \
     JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION} \
-    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE} \
+    CODE_SERVER_VERSION=${CODE_SERVER_VERSION} \
     GIT_VERSION=${GIT_VERSION} \
     GIT_LFS_VERSION=${GIT_LFS_VERSION} \
     PANDOC_VERSION=${PANDOC_VERSION}
@@ -145,7 +146,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && dpkg -i pandoc-${PANDOC_VERSION}-1-${dpkgArch}.deb \
   && rm pandoc-${PANDOC_VERSION}-1-${dpkgArch}.deb \
   ## Add user
-  && useradd -m -s /bin/bash -N -u ${NB_UID} ${NB_USER} \
+  && useradd -l -m -s /bin/bash -N -u ${NB_UID} ${NB_USER} \
   && mkdir -p /var/backups/skel \
   && chown ${NB_UID}:${NB_GID} /var/backups/skel \
   ## Install Tini
@@ -156,12 +157,13 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && rm -rf /var/lib/apt/lists/* \
     $HOME/.cache
 
-ENV PATH=/opt/code-server/bin:$PATH
+ENV PATH=/opt/code-server/bin:$PATH \
+    CS_DISABLE_GETTING_STARTED_OVERRIDE=1
 
 ## Install code-server
 RUN mkdir /opt/code-server \
   && cd /opt/code-server \
-  && curl -sL https://github.com/coder/code-server/releases/download/v${CODE_SERVER_RELEASE}/code-server-${CODE_SERVER_RELEASE}-linux-$(dpkg --print-architecture).tar.gz | tar zxf - --no-same-owner --strip-components=1 \
+  && curl -sL https://github.com/coder/code-server/releases/download/v${CODE_SERVER_VERSION}/code-server-${CODE_SERVER_VERSION}-linux-$(dpkg --print-architecture).tar.gz | tar zxf - --no-same-owner --strip-components=1 \
   && curl -sL https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg -o vscode.svg \
   ## Include custom fonts
   && sed -i 's|</head>|	<link rel="preload" href="{{BASE}}/_static/src/browser/media/fonts/MesloLGS-NF-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">\n	</head>|g' /opt/code-server/lib/vscode/out/vs/code/browser/workbench/workbench.html \
