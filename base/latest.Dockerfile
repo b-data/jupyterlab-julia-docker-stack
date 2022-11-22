@@ -22,6 +22,7 @@ RUN mkdir /files
 
 COPY assets /files
 COPY conf/julia /files/${JULIA_PATH}
+COPY conf/jupyterlab /files
 COPY conf/user /files
 COPY scripts /files
 
@@ -112,7 +113,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     apt-get -y install --no-install-recommends \
       python3-dev \
       python3-distutils \
-      ## venv module for python3
+      ## Install venv module for python3
       python3-venv; \
     ## make some useful symlinks that are expected to exist
     ## ("/usr/bin/python" and friends)
