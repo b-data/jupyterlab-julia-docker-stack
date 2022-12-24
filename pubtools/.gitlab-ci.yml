@@ -1,3 +1,8 @@
+.env:
+  variables:
+    JULIA_VERSION: "1.8.3"
+    UPDATE_MODE: "false"
+
 .before-script-build: &before-script-build
   - |
     if [[ ! -z "$CI_BUILD_PLATFORMS" ]]; then
@@ -6,9 +11,7 @@
     fi
   - |
     export CI_APP_REPO=${CI_APP_REPO:-$CI_REGISTRY_IMAGE}
-    if [[ $CI_COMMIT_BRANCH == "main" ]]; then
-      export CI_APP_TAG=${CI_APP_TAG:-latest}
-    elif [[ $CI_COMMIT_BRANCH == "freeze-version" ]]; then
+    if [[ $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "freeze-version" ]]; then
       export CI_APP_TAG=${CI_APP_TAG:-$JULIA_VERSION}
     else
       export CI_APP_TAG=${CI_APP_TAG:-$CI_COMMIT_SHA}
@@ -17,29 +20,27 @@
     echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER
     --password-stdin $CI_REGISTRY
   - >
-    export VERSION_MAJ_MIN_PAT=$JULIA_VERSION
-    
-    export VERSION_MAJ_MIN=`echo $VERSION_MAJ_MIN_PAT |
+    export VERSION_MAJ_MIN=`echo $JULIA_VERSION |
     sed -n "s|\([[:digit:]]\+\.[[:digit:]]\+\).*|\1|p"`
     
-    export VERSION_MAJ=`echo $VERSION_MAJ_MIN_PAT |
+    export VERSION_MAJ=`echo $JULIA_VERSION |
     sed -n "s|\([[:digit:]]\+\).*|\1|p"`
 
 .build:
   image: registry.gitlab.b-data.ch/docker/docker-buildx:latest
+  extends: .env
   services:
     - docker:dind
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: "/certs"
-    JULIA_VERSION: "1.8.2"
-    UPDATE_MODE: "false"
   before_script:
     - *before-script-build
 
 .post:
   image: registry.gitlab.b-data.ch/docker/docker-buildx:latest
   stage: .post
+  extends: .env
 
 stages:
   - .pre
@@ -58,15 +59,16 @@ build:latest-linux-amd64:
   script:
     - >
       docker build --pull
+      --build-arg BUILD_ON_IMAGE
       --build-arg JULIA_VERSION
       -t $CI_APP_REPO:$CI_APP_TAG-linux-amd64
-      -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-linux-amd64
+      -t $CI_APP_REPO:latest-linux-amd64
       -f pubtools/latest.Dockerfile .
     - >
       docker build
-      --build-arg BUILD_ON_IMAGE=$CI_APP_REPO:$VERSION_MAJ_MIN_PAT-linux-amd64
+      --build-arg BUILD_ON_IMAGE=$CI_APP_REPO:$CI_APP_TAG-linux-amd64
       -t $CI_APP_REPO:$CI_APP_TAG-root-linux-amd64
-      -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-root-linux-amd64
+      -t $CI_APP_REPO:latest-root-linux-amd64
       -f common/subtags/root/Dockerfile .
     - docker push -a $CI_APP_REPO
   rules:
@@ -83,15 +85,16 @@ build:latest-linux-arm64v8:
   script:
     - >
       docker build --pull
+      --build-arg BUILD_ON_IMAGE
       --build-arg JULIA_VERSION
       -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
-      -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-linux-arm64v8
+      -t $CI_APP_REPO:latest-linux-arm64v8
       -f pubtools/latest.Dockerfile .
     - >
       docker build
-      --build-arg BUILD_ON_IMAGE=$CI_APP_REPO:$VERSION_MAJ_MIN_PAT-linux-arm64v8
+      --build-arg BUILD_ON_IMAGE=$CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
       -t $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8
-      -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-root-linux-arm64v8
+      -t $CI_APP_REPO:latest-root-linux-arm64v8
       -f common/subtags/root/Dockerfile .
     - docker push -a $CI_APP_REPO
   rules:
@@ -108,6 +111,7 @@ build:version-linux-amd64:
   script:
     - >
       docker build --pull
+      --build-arg BUILD_ON_IMAGE
       -t $CI_APP_REPO:$CI_APP_TAG-linux-amd64
       -f pubtools/$JULIA_VERSION.Dockerfile .
     - >
@@ -130,6 +134,7 @@ build:version-linux-arm64v8:
   script:
     - >
       docker build --pull
+      --build-arg BUILD_ON_IMAGE
       -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
       -f pubtools/$JULIA_VERSION.Dockerfile .
     - >
@@ -165,16 +170,16 @@ build-manifest:latest-linux-multiarch:
       docker manifest push $CI_APP_REPO:$CI_APP_TAG
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-root
     - |
-      docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN_PAT $CI_MANIFEST_LIST
-      docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-root $CI_MANIFEST_LIST_ROOT
+      docker manifest create $CI_APP_REPO:latest $CI_MANIFEST_LIST
+      docker manifest create $CI_APP_REPO:latest-root $CI_MANIFEST_LIST_ROOT
       if echo $OS_ARCH | grep "linux-arm64v8" >/dev/null ; then
-        docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ_MIN_PAT \
+        docker manifest annotate --variant v8 $CI_APP_REPO:latest \
           $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
-        docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-root \
+        docker manifest annotate --variant v8 $CI_APP_REPO:latest-root \
           $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8
       fi
-      docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN_PAT
-      docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-root
+      docker manifest push $CI_APP_REPO:latest
+      docker manifest push $CI_APP_REPO:latest-root
     - |
       docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN $CI_MANIFEST_LIST
       docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN-root $CI_MANIFEST_LIST_ROOT
@@ -240,23 +245,23 @@ build:latest-devtools-linux-amd64:
       --build-arg BUILD_ON_IMAGE=$CI_APP_REPO
       --build-arg JULIA_VERSION
       -t $CI_APP_REPO:$CI_APP_TAG-devtools-linux-amd64
-      -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-devtools-linux-amd64
+      -t $CI_APP_REPO:latest-devtools-linux-amd64
       -f common/subtags/devtools/latest.Dockerfile .
     - >
       docker build
-      --build-arg BUILD_ON_IMAGE=$CI_APP_REPO:$VERSION_MAJ_MIN_PAT-devtools-linux-amd64
+      --build-arg BUILD_ON_IMAGE=$CI_APP_REPO:$CI_APP_TAG-devtools-linux-amd64
       -t $CI_APP_REPO:$CI_APP_TAG-devtools-root-linux-amd64
-      -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-devtools-root-linux-amd64
+      -t $CI_APP_REPO:latest-devtools-root-linux-amd64
       -f common/subtags/root/Dockerfile .
     - |
       docker push $CI_APP_REPO:$CI_APP_TAG-devtools-linux-amd64
-      docker push $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-devtools-linux-amd64
+      docker push $CI_APP_REPO:latest-devtools-linux-amd64
       docker push $CI_APP_REPO:$CI_APP_TAG-devtools-root-linux-amd64
-      docker push $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-devtools-root-linux-amd64
+      docker push $CI_APP_REPO:latest-devtools-root-linux-amd64
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $UPDATE_MODE != "true" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
       changes:
-        - base/latest.Dockerfile
+        - pubtools/latest.Dockerfile
         - common/subtags/devtools/latest.Dockerfile
 
 build:latest-devtools-linux-arm64v8:
@@ -271,23 +276,23 @@ build:latest-devtools-linux-arm64v8:
       --build-arg BUILD_ON_IMAGE=$CI_APP_REPO
       --build-arg JULIA_VERSION
       -t $CI_APP_REPO:$CI_APP_TAG-devtools-linux-arm64v8
-      -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-devtools-linux-arm64v8
+      -t $CI_APP_REPO:latest-devtools-linux-arm64v8
       -f common/subtags/devtools/latest.Dockerfile .
     - >
       docker build
-      --build-arg BUILD_ON_IMAGE=$CI_APP_REPO:$VERSION_MAJ_MIN_PAT-devtools-linux-arm64v8
+      --build-arg BUILD_ON_IMAGE=$CI_APP_REPO:$CI_APP_TAG-devtools-linux-arm64v8
       -t $CI_APP_REPO:$CI_APP_TAG-devtools-root-linux-arm64v8
-      -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-devtools-root-linux-arm64v8
+      -t $CI_APP_REPO:latest-devtools-root-linux-arm64v8
       -f common/subtags/root/Dockerfile .
     - |
       docker push $CI_APP_REPO:$CI_APP_TAG-devtools-linux-arm64v8
-      docker push $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-devtools-linux-arm64v8
+      docker push $CI_APP_REPO:latest-devtools-linux-arm64v8
       docker push $CI_APP_REPO:$CI_APP_TAG-devtools-root-linux-arm64v8
-      docker push $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-devtools-root-linux-arm64v8
+      docker push $CI_APP_REPO:latest-devtools-root-linux-arm64v8
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $UPDATE_MODE != "true" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
       changes:
-        - base/latest.Dockerfile
+        - pubtools/latest.Dockerfile
         - common/subtags/devtools/latest.Dockerfile
 
 build:version-devtools-linux-amd64:
@@ -311,9 +316,9 @@ build:version-devtools-linux-amd64:
       docker push $CI_APP_REPO:$CI_APP_TAG-devtools-linux-amd64
       docker push $CI_APP_REPO:$CI_APP_TAG-devtools-root-linux-amd64
   rules:
-    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
+    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_PIPELINE_TRIGGERED && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
       changes:
-        - base/$JULIA_VERSION.Dockerfile
+        - pubtools/$JULIA_VERSION.Dockerfile
         - common/subtags/devtools/$JULIA_VERSION.Dockerfile
 
 build:version-devtools-linux-arm64v8:
@@ -337,9 +342,9 @@ build:version-devtools-linux-arm64v8:
       docker push $CI_APP_REPO:$CI_APP_TAG-devtools-linux-arm64v8
       docker push $CI_APP_REPO:$CI_APP_TAG-devtools-root-linux-arm64v8
   rules:
-    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
+    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_PIPELINE_TRIGGERED && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
       changes:
-        - base/$JULIA_VERSION.Dockerfile
+        - pubtools/$JULIA_VERSION.Dockerfile
         - common/subtags/devtools/$JULIA_VERSION.Dockerfile
 
 build-manifest:latest-devtools-linux-multiarch:
@@ -364,16 +369,16 @@ build-manifest:latest-devtools-linux-multiarch:
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-devtools
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-devtools-root
     - |
-      docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-devtools $CI_MANIFEST_LIST
-      docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-devtools-root $CI_MANIFEST_LIST_ROOT
+      docker manifest create $CI_APP_REPO:latest-devtools $CI_MANIFEST_LIST
+      docker manifest create $CI_APP_REPO:latest-devtools-root $CI_MANIFEST_LIST_ROOT
       if echo $OS_ARCH | grep "linux-arm64v8" >/dev/null ; then
-        docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-devtools \
+        docker manifest annotate --variant v8 $CI_APP_REPO:latest-devtools \
           $CI_APP_REPO:$CI_APP_TAG-devtools-linux-arm64v8
-        docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-devtools-root \
+        docker manifest annotate --variant v8 $CI_APP_REPO:latest-devtools-root \
           $CI_APP_REPO:$CI_APP_TAG-devtools-root-linux-arm64v8
       fi
-      docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-devtools
-      docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-devtools-root
+      docker manifest push $CI_APP_REPO:latest-devtools
+      docker manifest push $CI_APP_REPO:latest-devtools-root
     - |
       docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN-devtools $CI_MANIFEST_LIST
       docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN-devtools-root $CI_MANIFEST_LIST_ROOT
@@ -399,7 +404,7 @@ build-manifest:latest-devtools-linux-multiarch:
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $UPDATE_MODE != "true"
       changes:
-        - base/latest.Dockerfile
+        - pubtools/latest.Dockerfile
         - common/subtags/devtools/latest.Dockerfile
 
 build-manifest:version-devtools-linux-multiarch:
@@ -424,7 +429,7 @@ build-manifest:version-devtools-linux-multiarch:
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-devtools
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-devtools-root
   rules:
-    - if: $CI_COMMIT_BRANCH == "freeze-version"
+    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_PIPELINE_TRIGGERED
       changes:
-        - base/$JULIA_VERSION.Dockerfile
+        - pubtools/$JULIA_VERSION.Dockerfile
         - common/subtags/devtools/$JULIA_VERSION.Dockerfile

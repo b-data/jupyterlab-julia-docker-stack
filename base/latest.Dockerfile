@@ -5,12 +5,12 @@ ARG JULIA_VERSION
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
-ARG JUPYTERHUB_VERSION=2.3.1
-ARG JUPYTERLAB_VERSION=3.5.0
+ARG JUPYTERHUB_VERSION=3.1.0
+ARG JUPYTERLAB_VERSION=3.5.2
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.8.3
-ARG GIT_VERSION=2.38.1
-ARG GIT_LFS_VERSION=3.2.0
+ARG CODE_SERVER_VERSION=4.9.1
+ARG GIT_VERSION=2.39.0
+ARG GIT_LFS_VERSION=3.3.0
 ARG PANDOC_VERSION=2.19.2
 
 FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION} as files
@@ -21,7 +21,10 @@ ENV NB_GID=100
 RUN mkdir /files
 
 COPY assets /files
+COPY conf/ipython /files
 COPY conf/julia /files/${JULIA_PATH}
+COPY conf/jupyter /files
+COPY conf/jupyterlab /files
 COPY conf/user /files
 COPY scripts /files
 
@@ -97,6 +100,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     psmisc \
     screen \
     sudo \
+    swig \
     tmux \
     vim \
     wget \
@@ -111,7 +115,9 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && if [ -z "$PYTHON_VERSION" ]; then \
     apt-get -y install --no-install-recommends \
       python3-dev \
-      python3-distutils; \
+      python3-distutils \
+      ## Install venv module for python3
+      python3-venv; \
     ## make some useful symlinks that are expected to exist
     ## ("/usr/bin/python" and friends)
     for src in pydoc3 python3 python3-config; do \
