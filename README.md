@@ -82,8 +82,8 @@ latest:
 
 ```bash
 cd base && docker build \
-  --build-arg JULIA_VERSION=1.8.1 \
-  -t jupyterlab-julia-base \
+  --build-arg JULIA_VERSION=1.8.4 \
+  -t jupyterlab/julia/base \
   -f latest.Dockerfile .
 ```
 
@@ -91,11 +91,11 @@ version:
 
 ```bash
 cd base && docker build \
-  -t jupyterlab-julia-base:<major>.<minor>.<patch> \
-  -f <major>.<minor>.<patch>.Dockerfile .
+  -t jupyterlab/julia/base:MAJOR.MINOR.PATCH \
+  -f MAJOR.MINOR.PATCH.Dockerfile .
 ```
 
-For `<major>.<minor>.<patch>` ≥ `1.7.3`.
+For `MAJOR.MINOR.PATCH` ≥ `1.7.3`.
 
 ### Run container
 
@@ -105,7 +105,7 @@ self built:
 docker run -it --rm \
   -p 8888:8888 \
   -v $PWD:/home/jovyan \
-  jupyterlab-julia-base[:<major>.<minor>.<patch>]
+  jupyterlab/julia/base[:MAJOR.MINOR.PATCH]
 ```
 
 from the project's GitLab Container Registries:
@@ -115,14 +115,14 @@ from the project's GitLab Container Registries:
     docker run -it --rm \
       -p 8888:8888 \
       -v $PWD:/home/jovyan \
-      registry.gitlab.b-data.ch/jupyterlab/julia/base[:<major>[.<minor>[.<patch>]]]
+      registry.gitlab.b-data.ch/jupyterlab/julia/base[:MAJOR[.MINOR[.PATCH]]]
     ```
 *  [`jupyterlab/julia/pubtools`](https://gitlab.b-data.ch/jupyterlab/julia/pubtools/container_registry)
     ```bash
     docker run -it --rm \
       -p 8888:8888 \
       -v $PWD:/home/jovyan \
-      registry.gitlab.b-data.ch/jupyterlab/julia/pubtools[:<major>[.<minor>[.<patch>]]]
+      registry.gitlab.b-data.ch/jupyterlab/julia/pubtools[:MAJOR[.MINOR[.PATCH]]]
     ```
 
 The use of the `-v` flag in the command mounts the current working directory on
