@@ -82,7 +82,7 @@ latest:
 
 ```bash
 cd base && docker build \
-  --build-arg JULIA_VERSION=1.8.4 \
+  --build-arg JULIA_VERSION=1.8.5 \
   -t jupyterlab/julia/base \
   -f latest.Dockerfile .
 ```
