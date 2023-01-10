@@ -3,7 +3,7 @@ ARG BASE_IMAGE_TAG=bullseye
 ARG BUILD_ON_IMAGE
 ARG JULIA_VERSION
 
-ARG NODE_VERSION=16.18.1
+ARG NODE_VERSION=16.19.0
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
 
 FROM registry.gitlab.b-data.ch/nodejs/nsi/${NODE_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} as nsi
@@ -38,6 +38,16 @@ RUN apt-get update \
     libxt6 \
     quilt \
     rsync \
+  && if [ ! -z "$PYTHON_VERSION" ]; then \
+    ## make some useful symlinks that are expected to exist
+    ## ("/usr/bin/python" and friends)
+    for src in pydoc3 python3; do \
+      dst="$(echo "$src" | tr -d 3)"; \
+      [ -s "/usr/bin/$src" ]; \
+      [ ! -e "/usr/bin/$dst" ]; \
+      ln -svT "$src" "/usr/bin/$dst"; \
+    done; \
+  fi \
   ## Clean up Node.js installation
   && bash -c 'rm /usr/local/bin/{yarn,yarnpkg}' \
   && bash -c 'rm /usr/local/{CHANGELOG.md,LICENSE,README.md}' \

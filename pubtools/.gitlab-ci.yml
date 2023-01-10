@@ -1,7 +1,6 @@
 .env:
   variables:
-    JULIA_VERSION: "1.8.3"
-    UPDATE_MODE: "false"
+    JULIA_VERSION: "1.8.4"
 
 .before-script-build: &before-script-build
   - |
