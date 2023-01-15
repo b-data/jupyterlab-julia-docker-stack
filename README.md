@@ -14,6 +14,10 @@ Images considered stable for Julia versions ≥ 1.7.3.
 
 :microscope: Check out `jupyterlab/julia/pubtools` at https://demo.jupyter.b-data.ch.
 
+**Build chain**
+
+base → pubtools
+
 **Features**
 
 * **JupyterLab**: A web-based interactive development environment for Jupyter
@@ -53,6 +57,14 @@ The following extensions are pre-installed for **code-server**:
 * [Quarto](https://open-vsx.org/extension/quarto/quarto)  
   :information_source: pubtools image, amd64 only
 * [YAML](https://open-vsx.org/extension/redhat/vscode-yaml)
+
+**Subtags**
+
+* `{JULIA_VERSION,latest}-root`: Container runs as `root`
+* `{JULIA_VERSION,latest}-devtools`: Includes the requirements according to
+  * [coder/code-server > Docs > Contributing](https://github.com/coder/code-server/blob/main/docs/CONTRIBUTING.md)
+  * [julia-vscode/julia-vscode > Contributing](https://github.com/julia-vscode/julia-vscode/blob/main/CONTRIBUTING.md)
+* `{JULIA_VERSION,latest}-devtools-root`: The combination of both
 
 ## Table of Contents
 
