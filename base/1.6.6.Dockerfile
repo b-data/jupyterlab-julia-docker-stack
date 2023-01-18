@@ -194,8 +194,8 @@ RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
   && unset JULIA_DEPOT_PATH \
   && mv $HOME/.local/share/jupyter/kernels/julia* /usr/local/share/jupyter/kernels/ \
   ## SymbolServer: Change permissions on store folder
-  && s3f=$(ls /opt/julia/local/share/julia/packages/SymbolServer) \
-  && cd /opt/julia/local/share/julia/packages/SymbolServer/${s3f} \
+  && s3f=$(ls $JULIA_DEPOT_PATH/packages/SymbolServer) \
+  && cd ${JULIA_DEPOT_PATH}/packages/SymbolServer/${s3f} \
   && chmod 777 store \
   ## Clean up
   && rm -rf $HOME/.local
