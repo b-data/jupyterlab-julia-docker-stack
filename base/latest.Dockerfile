@@ -229,6 +229,7 @@ RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
   ## Install the Julia kernel for JupyterLab
   && julia -e 'using Pkg; Pkg.add(["IJulia", "Revise", "LanguageServer"]); Pkg.precompile()' \
   && julia -e 'using Pkg; Pkg.add(readdir("$(ENV["JULIA_DEPOT_PATH"])/packages"))' \
+  && rm -rf ${JULIA_DEPOT_PATH}/registries/* \
   && chmod -R ugo+rx ${JULIA_DEPOT_PATH} \
   && mv $HOME/.local/share/jupyter/kernels/julia* /usr/local/share/jupyter/kernels/ \
   ## SymbolServer: Change permissions on store folder
