@@ -2,6 +2,7 @@ ARG BASE_IMAGE=debian
 ARG BASE_IMAGE_TAG=bullseye
 ARG BUILD_ON_IMAGE=registry.gitlab.b-data.ch/julia/ver
 ARG JULIA_VERSION
+ARG CUDA_IMAGE_FLAVOR
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
@@ -13,7 +14,7 @@ ARG GIT_VERSION=2.39.0
 ARG GIT_LFS_VERSION=3.3.0
 ARG PANDOC_VERSION=2.19.2
 
-FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION} as files
+FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} as files
 
 ARG NB_UID
 ENV NB_GID=100
@@ -38,7 +39,7 @@ RUN chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
 FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} as gsi
 FROM registry.gitlab.b-data.ch/git-lfs/glfsi:${GIT_LFS_VERSION} as glfsi
 
-FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}
+FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR}
 
 LABEL org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.source="https://gitlab.b-data.ch/jupyterlab/julia/docker-stack" \
@@ -48,6 +49,7 @@ LABEL org.opencontainers.image.licenses="MIT" \
 ARG DEBIAN_FRONTEND=noninteractive
 
 ARG BUILD_ON_IMAGE
+ARG CUDA_IMAGE_FLAVOR
 ARG NB_USER
 ARG NB_UID
 ARG JUPYTERHUB_VERSION
@@ -61,7 +63,7 @@ ARG BUILD_START
 
 ARG CODE_WORKDIR
 
-ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${JULIA_VERSION} \
+ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} \
     NB_USER=${NB_USER} \
     NB_UID=${NB_UID} \
     NB_GID=100 \
@@ -228,6 +230,10 @@ RUN pip install \
 RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
   ## Install the Julia kernel for JupyterLab
   && julia -e 'using Pkg; Pkg.add(["IJulia", "Revise", "LanguageServer"]); Pkg.precompile()' \
+  ## Install CUDA
+  && if [ ! -z "$CUDA_IMAGE" ]; then \
+    julia -e 'using Pkg; Pkg.add("CUDA"); Pkg.precompile()'; \
+  fi \
   && julia -e 'using Pkg; Pkg.add(readdir("$(ENV["JULIA_DEPOT_PATH"])/packages"))' \
   && rm -rf ${JULIA_DEPOT_PATH}/registries/* \
   && chmod -R ugo+rx ${JULIA_DEPOT_PATH} \
