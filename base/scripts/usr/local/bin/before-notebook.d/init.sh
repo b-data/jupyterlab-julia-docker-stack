@@ -33,7 +33,7 @@ if [ "$(id -u)" == 0 ] ; then
     update-locale --reset LANG=$LANG
   fi
 
-  # Install user-specific startup files for Julia REPL and IJulia
+  # Install user-specific startup files for Julia and IJulia
   su $NB_USER -c "mkdir -p .julia/config"
   if [[ ! -f ".julia/config/startup_ijulia.jl" ]]; then
     su $NB_USER -c "cp -a /var/backups/skel/.julia/config/startup_ijulia.jl \
@@ -71,7 +71,7 @@ else
     LANG=en_US.UTF-8
   fi
 
-  # Install user-specific startup files for Julia REPL and IJulia
+  # Install user-specific startup files for Julia and IJulia
   mkdir -p .julia/config
   if [[ ! -f ".julia/config/startup_ijulia.jl" ]]; then
     cp -a /var/backups/skel/.julia/config/startup_ijulia.jl \
