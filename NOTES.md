@@ -182,7 +182,7 @@ The Python version is selected as follows:
 
 This Python version is installed at `/user/local/bin`.
 
-# Notes on CUDA
+# Additional notes on CUDA
 
 The CUDA and OS versions are selected as follows:
 
@@ -203,7 +203,7 @@ The CUDA and OS versions are selected as follows:
 
 * `CUDA_IMAGE`: The CUDA image it is derived from.
 
-# Notes on subtag `devtools`
+# Additional notes on subtag `devtools`
 
 Node.js is installed with corepack enabled by default. Use it to manage Yarn
 and/or pnpm:
