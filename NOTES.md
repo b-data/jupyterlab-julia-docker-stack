@@ -83,7 +83,7 @@ unattended computations.
 **Miscellaneous**
 
 * `BASE_IMAGE`: Its very base, a [Docker Official Image](https://hub.docker.com/search?q=&type=image&image_filter=official).
-* `PARENT_IMAGE`: The image it was built on.
+* `PARENT_IMAGE`: The image it was derived from.
 * `BUILD_DATE`: The date it was built (ISO 8601 format).
 * `CTAN_REPO`: The CTAN mirror URL. (pubtools image)
 
@@ -122,7 +122,6 @@ are installed.
   * Theme > Selected Theme: JupyterLab Dark
   * Terminal > Font family: MesloLGS NF
   * Python LSP Server: Example settings according to [jupyter-lsp/jupyterlab-lsp > Installation > Configuring the servers](https://github.com/jupyter-lsp/jupyterlab-lsp#configuring-the-servers)
-  * R LSP Server: Example settings according to [jupyter-lsp/jupyterlab-lsp > Installation > Configuring the servers](https://github.com/jupyter-lsp/jupyterlab-lsp#configuring-the-servers)
 * [code-server](base/conf/user/var/backups/skel/.local/share/code-server/User/settings.json)
   * Text Editor > Tab Size: 2
   * Extensions > Gitlens > Graph > Status Bar: Enabled: off
@@ -188,8 +187,9 @@ The CUDA and OS versions are selected as follows:
 
 * CUDA: The lastest version that has image flavour `devel` including cuDNN
   available.
-* OS: The latest version that has TensortRT libraries for both `amd64` and
-  `arm64` available.
+* OS: The latest version that has TensortRT libraries for `amd64` available.  
+  :information_source: It is taking quite a long time for these to be available
+  for `arm64`.
 
 ## Tweaks
 
