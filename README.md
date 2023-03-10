@@ -68,6 +68,13 @@ The following extensions are pre-installed for **code-server**:
   * [coder/code-server > Docs > Contributing](https://github.com/coder/code-server/blob/main/docs/CONTRIBUTING.md)
   * [julia-vscode/julia-vscode > Contributing](https://github.com/julia-vscode/julia-vscode/blob/main/CONTRIBUTING.md)
 * `{JULIA_VERSION,latest}-devtools-root`: The combination of both
+* `{JULIA_VERSION,latest}-docker`: Includes
+  * `docker-ce-cli`
+  * `docker-buildx-plugin`
+  * `docker-compose-plugin`
+* `{JULIA_VERSION,latest}-docker-root`: The combination of both
+* `{JULIA_VERSION,latest}-devtools-docker`: The combination of both
+* `{JULIA_VERSION,latest}-devtools-docker-root`: The combination of all three
 
 ## Table of Contents
 
