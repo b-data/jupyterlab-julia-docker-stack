@@ -7,9 +7,9 @@
 
 Multi-arch (`linux/amd64`, `linux/arm64/v8`) docker images:
 
-* [`registry.gitlab.b-data.ch/jupyterlab/julia/base`](https://gitlab.b-data.ch/jupyterlab/julia/base/container_registry)
-  * [`registry.gitlab.b-data.ch/jupyterlab/julia/ver`](https://gitlab.b-data.ch/jupyterlab/julia/ver/container_registry) (1.5.4 ≤ version < 1.7.3)
-* [`registry.gitlab.b-data.ch/jupyterlab/julia/pubtools`](https://gitlab.b-data.ch/jupyterlab/julia/pubtools/container_registry)
+* [`glcr.b-data.ch/jupyterlab/julia/base`](https://gitlab.b-data.ch/jupyterlab/julia/base/container_registry)
+  * [`glcr.b-data.ch/jupyterlab/julia/ver`](https://gitlab.b-data.ch/jupyterlab/julia/ver/container_registry) (1.5.4 ≤ version < 1.7.3)
+* [`glcr.b-data.ch/jupyterlab/julia/pubtools`](https://gitlab.b-data.ch/jupyterlab/julia/pubtools/container_registry)
 
 Images considered stable for Julia versions ≥ 1.7.3.  
 :point_right: The current state may eventually be backported to versions ≥
@@ -137,14 +137,14 @@ from the project's GitLab Container Registries:
   docker run -it --rm \
     -p 8888:8888 \
     -v $PWD:/home/jovyan \
-    registry.gitlab.b-data.ch/jupyterlab/julia/base[:MAJOR[.MINOR[.PATCH]]]
+    glcr.b-data.ch/jupyterlab/julia/base[:MAJOR[.MINOR[.PATCH]]]
   ```
 * [`jupyterlab/julia/pubtools`](https://gitlab.b-data.ch/jupyterlab/julia/pubtools/container_registry)
   ```bash
   docker run -it --rm \
     -p 8888:8888 \
     -v $PWD:/home/jovyan \
-    registry.gitlab.b-data.ch/jupyterlab/julia/pubtools[:MAJOR[.MINOR[.PATCH]]]
+    glcr.b-data.ch/jupyterlab/julia/pubtools[:MAJOR[.MINOR[.PATCH]]]
   ```
 
 The use of the `-v` flag in the command mounts the current working directory on

@@ -2,8 +2,8 @@
 
 GPU accelerated, multi-arch (`linux/amd64`, `linux/arm64/v8`) docker images:
 
-* [`registry.gitlab.b-data.ch/jupyterlab/cuda/julia/base`](https://gitlab.b-data.ch/jupyterlab/cuda/julia/base/container_registry)
-* [`registry.gitlab.b-data.ch/jupyterlab/cuda/julia/pubtools`](https://gitlab.b-data.ch/jupyterlab/cuda/julia/pubtools/container_registry)
+* [`glcr.b-data.ch/jupyterlab/cuda/julia/base`](https://gitlab.b-data.ch/jupyterlab/cuda/julia/base/container_registry)
+* [`glcr.b-data.ch/jupyterlab/cuda/julia/pubtools`](https://gitlab.b-data.ch/jupyterlab/cuda/julia/pubtools/container_registry)
 
 Images available for Julia versions ≥ 1.8.5.
 
@@ -70,7 +70,7 @@ latest:
 cd base && docker build \
   --build-arg BASE_IMAGE=ubuntu \
   --build-arg BASE_IMAGE_TAG=22.04 \
-  --build-arg BUILD_ON_IMAGE=registry.gitlab.b-data.ch/cuda/julia/ver \
+  --build-arg BUILD_ON_IMAGE=glcr.b-data.ch/cuda/julia/ver \
   --build-arg JULIA_VERSION=1.8.5 \
   --build-arg CUDA_IMAGE_FLAVOR=devel \
   -t jupyterlab/cuda/julia/base \
@@ -83,7 +83,7 @@ version:
 cd base && docker build \
   --build-arg BASE_IMAGE=ubuntu \
   --build-arg BASE_IMAGE_TAG=22.04 \
-  --build-arg BUILD_ON_IMAGE=registry.gitlab.b-data.ch/cuda/julia/ver \
+  --build-arg BUILD_ON_IMAGE=glcr.b-data.ch/cuda/julia/ver \
   --build-arg CUDA_IMAGE_FLAVOR=devel \
   -t jupyterlab/cuda/julia/base:MAJOR.MINOR.PATCH \
   -f MAJOR.MINOR.PATCH.Dockerfile .
@@ -111,7 +111,7 @@ from the project's GitLab Container Registries:
     --gpus '"device=all"' \
     -p 8888:8888 \
     -v $PWD:/home/jovyan \
-    registry.gitlab.b-data.ch/jupyterlab/cuda/julia/base[:MAJOR[.MINOR[.PATCH]]]
+    glcr.b-data.ch/jupyterlab/cuda/julia/base[:MAJOR[.MINOR[.PATCH]]]
   ```
 * [`jupyterlab/cuda/julia/pubtools`](https://gitlab.b-data.ch/jupyterlab/cuda/julia/pubtools/container_registry)  
   ```bash
@@ -119,7 +119,7 @@ from the project's GitLab Container Registries:
     --gpus '"device=all"' \
     -p 8888:8888 \
     -v $PWD:/home/jovyan \
-    registry.gitlab.b-data.ch/jupyterlab/cuda/julia/pubtools[:MAJOR[.MINOR[.PATCH]]]
+    glcr.b-data.ch/jupyterlab/cuda/julia/pubtools[:MAJOR[.MINOR[.PATCH]]]
   ```
 
 The use of the `-v` flag in the command mounts the current working directory on
