@@ -20,6 +20,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     docker-ce-cli \
     docker-buildx-plugin \
     docker-compose-plugin \
+    docker-scan-plugin \
   && ln -s /usr/libexec/docker/cli-plugins/docker-compose \
     /usr/local/bin/docker-compose \
   ## Clean up

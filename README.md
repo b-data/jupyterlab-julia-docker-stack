@@ -72,6 +72,7 @@ The following extensions are pre-installed for **code-server**:
   * `docker-ce-cli`
   * `docker-buildx-plugin`
   * `docker-compose-plugin`
+  * `docker-scan-plugin`
 * `{JULIA_VERSION,latest}-docker-root`: The combination of both
 * `{JULIA_VERSION,latest}-devtools-docker`: The combination of both
 * `{JULIA_VERSION,latest}-devtools-docker-root`: The combination of all three
