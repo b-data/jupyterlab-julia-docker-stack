@@ -54,6 +54,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && wget -qO- "https://yihui.org/tinytex/install-unx.sh" \
     | sh -s - --admin --no-path \
   && mv ~/.TinyTeX /opt/TinyTeX \
+  && sed -i 's/\/root\/.TinyTeX/\/opt\/TinyTeX/g' \
+    /opt/TinyTeX/texmf-var/fonts/conf/texlive-fontconfig.conf \
   && ln -rs /opt/TinyTeX/bin/$(uname -m)-linux \
     /opt/TinyTeX/bin/linux \
   && /opt/TinyTeX/bin/linux/tlmgr path add \
@@ -78,12 +80,17 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && chown -R root:${NB_GID} /opt/TinyTeX \
   && chmod -R g+w /opt/TinyTeX \
   && chmod -R g+wx /opt/TinyTeX/bin \
+  ## Make the TeX Live fonts available as system fonts
+  && cp /opt/TinyTeX/texmf-var/fonts/conf/texlive-fontconfig.conf \
+    /etc/fonts/conf.d/09-texlive.conf \
+  && fc-cache -fsv \
   ## Install code-server extensions
   && if [ ${dpkgArch} = "amd64" ]; then \
     code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension quarto.quarto; \
   fi \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop \
   ## Clean up
+  && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/* \
     $HOME/.config \
     $HOME/.local \
