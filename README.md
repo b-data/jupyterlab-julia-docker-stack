@@ -36,7 +36,7 @@ base → pubtools
   * **Python**: An interpreted, object-oriented, high-level programming language
     with dynamic semantics.
   * **Quarto**: A scientific and technical publishing system built on Pandoc.  
-    :information_source: pubtools image, amd64 only
+    :information_source: pubtools image
   * **TinyTeX**: A lightweight, cross-platform, portable, and easy-to-maintain
     LaTeX distribution based on TeX Live.  
     :information_source: pubtools image
@@ -61,7 +61,7 @@ The following extensions are pre-installed for **code-server**:
 * [Project Manager](https://open-vsx.org/extension/alefragnani/project-manager)
 * [Python](https://open-vsx.org/extension/ms-python/python)
 * [Quarto](https://open-vsx.org/extension/quarto/quarto)  
-  :information_source: pubtools image, amd64 only
+  :information_source: pubtools image
 * [YAML](https://open-vsx.org/extension/redhat/vscode-yaml)
 
 **Subtags**
