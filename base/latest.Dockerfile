@@ -1,19 +1,20 @@
 ARG BASE_IMAGE=debian
 ARG BASE_IMAGE_TAG=bullseye
-ARG BUILD_ON_IMAGE=registry.gitlab.b-data.ch/julia/ver
+ARG BUILD_ON_IMAGE=glcr.b-data.ch/julia/ver
 ARG JULIA_VERSION
+ARG CUDA_IMAGE_FLAVOR
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
-ARG JUPYTERHUB_VERSION=3.1.0
-ARG JUPYTERLAB_VERSION=3.5.2
+ARG JUPYTERHUB_VERSION=4.0.0
+ARG JUPYTERLAB_VERSION=3.6.3
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
 ARG CODE_SERVER_VERSION=4.9.1
-ARG GIT_VERSION=2.39.0
+ARG GIT_VERSION=2.40.1
 ARG GIT_LFS_VERSION=3.3.0
-ARG PANDOC_VERSION=2.19.2
+ARG PANDOC_VERSION=3.1.1
 
-FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION} as files
+FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} as files
 
 ARG NB_UID
 ENV NB_GID=100
@@ -35,10 +36,10 @@ RUN chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
   && find /files -type f -exec chmod 644 {} \; \
   && find /files/usr/local/bin -type f -exec chmod 755 {} \;
 
-FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} as gsi
-FROM registry.gitlab.b-data.ch/git-lfs/glfsi:${GIT_LFS_VERSION} as glfsi
+FROM glcr.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} as gsi
+FROM glcr.b-data.ch/git-lfs/glfsi:${GIT_LFS_VERSION} as glfsi
 
-FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}
+FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR}
 
 LABEL org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.source="https://gitlab.b-data.ch/jupyterlab/julia/docker-stack" \
@@ -48,6 +49,7 @@ LABEL org.opencontainers.image.licenses="MIT" \
 ARG DEBIAN_FRONTEND=noninteractive
 
 ARG BUILD_ON_IMAGE
+ARG CUDA_IMAGE_FLAVOR
 ARG NB_USER
 ARG NB_UID
 ARG JUPYTERHUB_VERSION
@@ -57,19 +59,22 @@ ARG CODE_SERVER_VERSION
 ARG GIT_VERSION
 ARG GIT_LFS_VERSION
 ARG PANDOC_VERSION
+ARG BUILD_START
 
 ARG CODE_WORKDIR
 
-ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${JULIA_VERSION} \
+ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} \
     NB_USER=${NB_USER} \
     NB_UID=${NB_UID} \
-    NB_GID=100 \
     JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION} \
     JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION} \
     CODE_SERVER_VERSION=${CODE_SERVER_VERSION} \
     GIT_VERSION=${GIT_VERSION} \
     GIT_LFS_VERSION=${GIT_LFS_VERSION} \
-    PANDOC_VERSION=${PANDOC_VERSION}
+    PANDOC_VERSION=${PANDOC_VERSION} \
+    BUILD_DATE=${BUILD_START}
+
+ENV NB_GID=100
 
 ## Install Git
 COPY --from=gsi /usr/local /usr/local
@@ -79,6 +84,10 @@ COPY --from=glfsi /usr/local /usr/local
 USER root
 
 RUN dpkgArch="$(dpkg --print-architecture)" \
+  ## Unminimise if the system has been minimised
+  && if [ $(command -v unminimize) ]; then \
+    yes | unminimize; \
+  fi \
   && apt-get update \
   && apt-get -y install --no-install-recommends \
     bash-completion \
@@ -105,13 +114,13 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     vim-tiny \
     wget \
     zsh \
-    ## Additional git runtime dependencies
+    ## Git: Additional runtime dependencies
     libcurl3-gnutls \
     liberror-perl \
-    ## Additional git runtime recommendations
+    ## Git: Additional runtime recommendations
     less \
     ssh-client \
-  ## Additional python-dev dependencies
+  ## Python: Additional dev dependencies
   && if [ -z "$PYTHON_VERSION" ]; then \
     apt-get -y install --no-install-recommends \
       python3-dev \
@@ -143,17 +152,26 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && curl -sL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf -o /usr/share/fonts/truetype/meslo/MesloLGS\ NF\ Bold.ttf \
   && curl -sL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf -o /usr/share/fonts/truetype/meslo/MesloLGS\ NF\ Italic.ttf \
   && curl -sL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf -o /usr/share/fonts/truetype/meslo/MesloLGS\ NF\ Bold\ Italic.ttf \
-  && fc-cache -fv \
-  ## Set default branch name to main
-  && sudo git config --system init.defaultBranch main \
-  ## Store passwords for one hour in memory
+  && fc-cache -fsv \
+  ## Git: Set default branch name to main
+  && git config --system init.defaultBranch main \
+  ## Git: Store passwords for one hour in memory
   && git config --system credential.helper "cache --timeout=3600" \
-  ## Merge the default branch from the default remote when "git pull" is run
-  && sudo git config --system pull.rebase false \
+  ## Git: Merge the default branch from the default remote when "git pull" is run
+  && git config --system pull.rebase false \
   ## Install pandoc
   && curl -sLO https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-${dpkgArch}.deb \
   && dpkg -i pandoc-${PANDOC_VERSION}-1-${dpkgArch}.deb \
   && rm pandoc-${PANDOC_VERSION}-1-${dpkgArch}.deb \
+  ## Delete potential user with UID 1000
+  && if $(grep -q 1000 /etc/passwd); then \
+    userdel $(id -un 1000); \
+  fi \
+  ## Do not set user limits for sudo/sudo-i
+  && sed -i 's/.*pam_limits.so/#&/g' /etc/pam.d/sudo \
+  && if [ -f "/etc/pam.d/sudo-i" ]; then \
+    sed -i 's/.*pam_limits.so/#&/g' /etc/pam.d/sudo-i; \
+  fi \
   ## Add user
   && useradd -l -m -s /bin/bash -N -u ${NB_UID} ${NB_USER} \
   && mkdir -p /var/backups/skel \
@@ -188,11 +206,13 @@ RUN mkdir /opt/code-server \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator-1.0.3.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-toolsai.jupyter \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension mhutchie.git-graph \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension editorconfig.editorconfig \
   ## Create folders temp and tmp for Jupyter extension
   && cd /opt/code-server/lib/vscode/extensions/ms-toolsai.jupyter-* \
   && mkdir -m 1777 temp \
@@ -226,7 +246,12 @@ RUN pip install \
 RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
   ## Install the Julia kernel for JupyterLab
   && julia -e 'using Pkg; Pkg.add(["IJulia", "Revise", "LanguageServer"]); Pkg.precompile()' \
+  ## Install CUDA
+  && if [ ! -z "$CUDA_IMAGE" ]; then \
+    julia -e 'using Pkg; Pkg.add("CUDA"); Pkg.precompile()'; \
+  fi \
   && julia -e 'using Pkg; Pkg.add(readdir("$(ENV["JULIA_DEPOT_PATH"])/packages"))' \
+  && rm -rf ${JULIA_DEPOT_PATH}/registries/* \
   && chmod -R ugo+rx ${JULIA_DEPOT_PATH} \
   && mv $HOME/.local/share/jupyter/kernels/julia* /usr/local/share/jupyter/kernels/ \
   ## SymbolServer: Change permissions on store folder

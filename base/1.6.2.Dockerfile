@@ -80,11 +80,11 @@ RUN apt-get update \
   && dpkg -i pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
   && rm pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
   ## Set default branch name to main
-  && sudo git config --system init.defaultBranch main \
+  && git config --system init.defaultBranch main \
   ## Store passwords for one hour in memory
   && git config --system credential.helper "cache --timeout=3600" \
   ## Merge the default branch from the default remote when "git pull" is run
-  && sudo git config --system pull.rebase false \
+  && git config --system pull.rebase false \
   ## Add user
   && useradd -m -s /bin/bash -N -u ${NB_UID} ${NB_USER}
 

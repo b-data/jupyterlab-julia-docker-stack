@@ -3,10 +3,10 @@ ARG BASE_IMAGE_TAG=bullseye
 ARG BUILD_ON_IMAGE
 ARG JULIA_VERSION
 
-ARG NODE_VERSION=16.19.0
+ARG NODE_VERSION=16.20.0
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
 
-FROM registry.gitlab.b-data.ch/nodejs/nsi/${NODE_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} as nsi
+FROM glcr.b-data.ch/nodejs/nsi/${NODE_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} as nsi
 
 FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}
 
@@ -16,9 +16,11 @@ ARG BUILD_ON_IMAGE
 
 ARG NODE_VERSION
 ARG CODE_BUILTIN_EXTENSIONS_DIR
+ARG BUILD_START
 
 ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${JULIA_VERSION} \
-    NODE_VERSION=${NODE_VERSION}
+    NODE_VERSION=${NODE_VERSION} \
+    BUILD_DATE=${BUILD_START}
 
 ## Install Node.js
 COPY --from=nsi /usr/local /usr/local
@@ -49,8 +51,8 @@ RUN apt-get update \
     done; \
   fi \
   ## Clean up Node.js installation
-  && bash -c 'rm /usr/local/bin/{yarn,yarnpkg}' \
-  && bash -c 'rm /usr/local/{CHANGELOG.md,LICENSE,README.md}' \
+  && bash -c 'rm -f /usr/local/bin/{docker-entrypoint.sh,yarn*}' \
+  && bash -c 'rm -f /usr/local/{CHANGELOG.md,LICENSE,README.md}' \
   ## Enable corepack (Yarn, pnpm)
   && corepack enable \
   ## Install nFPM
@@ -61,6 +63,7 @@ RUN apt-get update \
   ## Install code-server extensions
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension dbaeumer.vscode-eslint \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension esbenp.prettier-vscode \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.black-formatter \
   ## Clean up
   && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/* \

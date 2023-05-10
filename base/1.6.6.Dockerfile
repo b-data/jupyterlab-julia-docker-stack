@@ -73,11 +73,11 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && curl -sL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf -o /usr/share/fonts/truetype/meslo/MesloLGS\ NF\ Bold\ Italic.ttf \
   && fc-cache -fv \
   ## Set default branch name to main
-  && sudo git config --system init.defaultBranch main \
+  && git config --system init.defaultBranch main \
   ## Store passwords for one hour in memory
   && git config --system credential.helper "cache --timeout=3600" \
   ## Merge the default branch from the default remote when "git pull" is run
-  && sudo git config --system pull.rebase false \
+  && git config --system pull.rebase false \
   ## Install Git LFS
   && cd /tmp \
   && curl -sSLO https://github.com/git-lfs/git-lfs/releases/download/v${GIT_LFS_VERSION}/git-lfs-linux-${dpkgArch}-v${GIT_LFS_VERSION}.tar.gz \
@@ -194,8 +194,8 @@ RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
   && unset JULIA_DEPOT_PATH \
   && mv $HOME/.local/share/jupyter/kernels/julia* /usr/local/share/jupyter/kernels/ \
   ## SymbolServer: Change permissions on store folder
-  && s3f=$(ls /opt/julia/local/share/julia/packages/SymbolServer) \
-  && cd /opt/julia/local/share/julia/packages/SymbolServer/${s3f} \
+  && s3f=$(ls $JULIA_DEPOT_PATH/packages/SymbolServer) \
+  && cd ${JULIA_DEPOT_PATH}/packages/SymbolServer/${s3f} \
   && chmod 777 store \
   ## Clean up
   && rm -rf $HOME/.local

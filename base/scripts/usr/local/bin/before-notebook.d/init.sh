@@ -33,7 +33,7 @@ if [ "$(id -u)" == 0 ] ; then
     update-locale --reset LANG=$LANG
   fi
 
-  # Install user-specific startup files for Julia REPL and IJulia
+  # Install user-specific startup files for Julia and IJulia
   su $NB_USER -c "mkdir -p .julia/config"
   if [[ ! -f ".julia/config/startup_ijulia.jl" ]]; then
     su $NB_USER -c "cp -a /var/backups/skel/.julia/config/startup_ijulia.jl \
@@ -45,6 +45,12 @@ if [ "$(id -u)" == 0 ] ; then
   fi
 
   # Update code-server settings
+  su $NB_USER -c "mkdir -p .local/share/code-server/User"
+  if [[ ! -f ".local/share/code-server/User/settings.json" ]]; then
+    su $NB_USER -c "cp -a /var/backups/skel/.local/share/code-server/User/settings.json \
+      .local/share/code-server/User/settings.json"
+  fi
+
   su $NB_USER -c "mv .local/share/code-server/User/settings.json \
     .local/share/code-server/User/settings.json.bak"
   su $NB_USER -c "sed -i ':a;N;\$!ba;s/,\n\}/\n}/g' \
@@ -71,7 +77,7 @@ else
     LANG=en_US.UTF-8
   fi
 
-  # Install user-specific startup files for Julia REPL and IJulia
+  # Install user-specific startup files for Julia and IJulia
   mkdir -p .julia/config
   if [[ ! -f ".julia/config/startup_ijulia.jl" ]]; then
     cp -a /var/backups/skel/.julia/config/startup_ijulia.jl \
@@ -83,6 +89,12 @@ else
   fi
 
   # Update code-server settings
+  mkdir -p .local/share/code-server/User
+  if [[ ! -f ".local/share/code-server/User/settings.json" ]]; then
+    cp -a /var/backups/skel/.local/share/code-server/User/settings.json \
+      .local/share/code-server/User/settings.json
+  fi
+
   mv .local/share/code-server/User/settings.json \
     .local/share/code-server/User/settings.json.bak
   sed -i ':a;N;$!ba;s/,\n\}/\n}/g' \
