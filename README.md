@@ -66,16 +66,17 @@ The following extensions are pre-installed for **code-server**:
 
 **Subtags**
 
-* `{JULIA_VERSION,latest}-root`: Container runs as `root`
-* `{JULIA_VERSION,latest}-devtools`: Includes the requirements according to
+* `{JULIA_VERSION,latest}-root` (versions ≥ 1.7.3): Container runs as `root`
+* `{JULIA_VERSION,latest}-devtools` (versions ≥ 1.8.2): Includes the
+  requirements according to
   * [coder/code-server > Docs > Contributing](https://github.com/coder/code-server/blob/main/docs/CONTRIBUTING.md)
   * [julia-vscode/julia-vscode > Contributing](https://github.com/julia-vscode/julia-vscode/blob/main/CONTRIBUTING.md)
 * `{JULIA_VERSION,latest}-devtools-root`: The combination of both
-* `{JULIA_VERSION,latest}-docker`: Includes
+* `{JULIA_VERSION,latest}-docker` (versions ≥ 1.8.5): Includes
   * `docker-ce-cli`
   * `docker-buildx-plugin`
   * `docker-compose-plugin`
-  * `docker-scan-plugin`
+  * `docker-scan-plugin` (amd64 only)
 * `{JULIA_VERSION,latest}-docker-root`: The combination of both
 * `{JULIA_VERSION,latest}-devtools-docker`: The combination of both
 * `{JULIA_VERSION,latest}-devtools-docker-root`: The combination of all three
