@@ -12,4 +12,6 @@ if isfile(joinpath(pwd(), "Project.toml")) && isfile(joinpath(pwd(), "Manifest.t
 else
     Pkg.activate("$(ENV["HOME"])/.julia/environments/v$(VERSION.major).$(VERSION.minor)")
 end
-println("  → Overrides the environment set by the VS Code Julia extension!")
+if "TERM_PROGRAM" in keys(ENV)
+    println("  → Overrides the environment set by the Code Julia extension!")
+end
