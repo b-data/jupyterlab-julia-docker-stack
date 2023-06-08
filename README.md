@@ -49,6 +49,12 @@ information.
 The following extensions are pre-installed for **code-server**:
 
 * [.gitignore Generator](https://github.com/piotrpalarz/vscode-gitignore-generator)
+* [Black Formatter](https://open-vsx.org/extension/ms-python/black-formatter)  
+  :information_source: devtools subtags
+* [Docker](https://open-vsx.org/extension/ms-azuretools/vscode-docker)  
+  :information_source: docker subtags
+* [ESLint](https://open-vsx.org/extension/dbaeumer/vscode-eslint)  
+  :information_source: devtools subtags
 * [Git Graph](https://open-vsx.org/extension/mhutchie/git-graph)
 * [GitLab Workflow](https://open-vsx.org/extension/GitLab/gitlab-workflow)
 * [GitLens — Git supercharged](https://open-vsx.org/extension/eamodio/gitlens)
@@ -58,6 +64,8 @@ The following extensions are pre-installed for **code-server**:
 * [LaTeX Workshop](https://open-vsx.org/extension/James-Yu/latex-workshop)  
   :information_source: pubtools image
 * [Path Intellisense](https://open-vsx.org/extension/christian-kohler/path-intellisense)
+* [Prettier - Code formatter](https://open-vsx.org/extension/esbenp/prettier-vscode)  
+  :information_source: devtools subtags
 * [Project Manager](https://open-vsx.org/extension/alefragnani/project-manager)
 * [Python](https://open-vsx.org/extension/ms-python/python)
 * [Quarto](https://open-vsx.org/extension/quarto/quarto)  
@@ -66,16 +74,17 @@ The following extensions are pre-installed for **code-server**:
 
 **Subtags**
 
-* `{JULIA_VERSION,latest}-root`: Container runs as `root`
-* `{JULIA_VERSION,latest}-devtools`: Includes the requirements according to
+* `{JULIA_VERSION,latest}-root` (versions ≥ 1.7.3): Container runs as `root`
+* `{JULIA_VERSION,latest}-devtools` (versions ≥ 1.8.2): Includes the
+  requirements according to
   * [coder/code-server > Docs > Contributing](https://github.com/coder/code-server/blob/main/docs/CONTRIBUTING.md)
   * [julia-vscode/julia-vscode > Contributing](https://github.com/julia-vscode/julia-vscode/blob/main/CONTRIBUTING.md)
 * `{JULIA_VERSION,latest}-devtools-root`: The combination of both
-* `{JULIA_VERSION,latest}-docker`: Includes
+* `{JULIA_VERSION,latest}-docker` (versions ≥ 1.8.5): Includes
   * `docker-ce-cli`
   * `docker-buildx-plugin`
   * `docker-compose-plugin`
-  * `docker-scan-plugin`
+  * `docker-scan-plugin` (amd64 only)
 * `{JULIA_VERSION,latest}-docker-root`: The combination of both
 * `{JULIA_VERSION,latest}-devtools-docker`: The combination of both
 * `{JULIA_VERSION,latest}-devtools-docker-root`: The combination of all three
@@ -108,7 +117,7 @@ To install docker, follow the instructions for your platform:
 
 ```bash
 cd base && docker build \
-  --build-arg JULIA_VERSION=1.8.5 \
+  --build-arg JULIA_VERSION=1.9.0 \
   -t jupyterlab/julia/base \
   -f latest.Dockerfile .
 ```

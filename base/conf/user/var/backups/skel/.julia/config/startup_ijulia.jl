@@ -9,9 +9,9 @@ if ispath(joinpath(ENV["HOME"], "bin")) && ENV["SHLVL"] == "0"
         ENV["PATH"]
 end
 
-if ispath(joinpath(ENV["HOME"], ".local/bin")) && ENV["SHLVL"] == "0"
+if ispath(joinpath(ENV["HOME"], ".local", "bin")) && ENV["SHLVL"] == "0"
     ENV["PATH"] =
-        joinpath(ENV["HOME"], ".local/bin") *
+        joinpath(ENV["HOME"], ".local", "bin") *
         (Sys.iswindows() ? ';' : ':') *
         ENV["PATH"]
 end
