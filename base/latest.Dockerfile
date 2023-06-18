@@ -9,7 +9,7 @@ ARG NB_UID=1000
 ARG JUPYTERHUB_VERSION=4.0.1
 ARG JUPYTERLAB_VERSION=3.6.4
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.13.0
+ARG CODE_SERVER_VERSION=4.14.0
 ARG GIT_VERSION=2.41.0
 ARG GIT_LFS_VERSION=3.3.0
 ARG PANDOC_VERSION=3.1.1
@@ -251,7 +251,9 @@ RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
   && julia -e 'using Pkg; Pkg.add(["IJulia", "Revise", "LanguageServer"]); Pkg.precompile()' \
   ## Install CUDA
   && if [ ! -z "$CUDA_IMAGE" ]; then \
-    julia -e 'using Pkg; Pkg.add("CUDA"); Pkg.precompile()'; \
+    julia -e 'using Pkg; Pkg.add("CUDA")'; \
+    julia -e 'using CUDA; CUDA.set_runtime_version!("local")'; \
+    julia -e 'using CUDA; CUDA.precompile_runtime()'; \
   fi \
   && julia -e 'using Pkg; Pkg.add(readdir("$(ENV["JULIA_DEPOT_PATH"])/packages"))' \
   && rm -rf ${JULIA_DEPOT_PATH}/registries/* \
