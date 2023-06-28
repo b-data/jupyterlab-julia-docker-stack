@@ -12,6 +12,8 @@
       "graph": false
     }
   },
+  "gitlens.showWelcomeOnInstall": false,
+  "gitlens.showWhatsNewAfterUpgrades": false,
   "julia.enableCrashReporter": false,
   "julia.enableTelemetry": false,
   "resmon.show.battery": false,
