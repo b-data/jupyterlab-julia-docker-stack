@@ -15,6 +15,21 @@ catch e
     @warn "Error initializing Revise" exception=(e, catch_backtrace())
 end
 
+if !isempty(get(ENV, "CUDA_VERSION", ""))
+    try
+        using CUDA
+        try 
+            @assert CUDA.functional(true)
+            println("CUDA functional")
+            println("CUDA may invalidate Revise: https://github.com/timholy/Revise.jl/issues/746")
+        catch e
+            @warn "Error initializing CUDA" exception=(e, catch_backtrace())
+        end
+    catch e
+        @warn "Error initializing CUDA" exception=(e, catch_backtrace())
+    end
+end
+
 if !isnothing(project) &&
     # https://github.com/julia-vscode/julia-vscode/issues/3304
     !startswith(Base.load_path_expand(Base.LOAD_PATH[end]), project)

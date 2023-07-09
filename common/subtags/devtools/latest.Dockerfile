@@ -1,9 +1,9 @@
 ARG BASE_IMAGE=debian
-ARG BASE_IMAGE_TAG=bullseye
+ARG BASE_IMAGE_TAG=12
 ARG BUILD_ON_IMAGE
 ARG JULIA_VERSION
 
-ARG NODE_VERSION=16.20.0
+ARG NODE_VERSION=16.20.1
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
 
 FROM glcr.b-data.ch/nodejs/nsi/${NODE_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} as nsi
@@ -52,7 +52,8 @@ RUN apt-get update \
   fi \
   ## Clean up Node.js installation
   && bash -c 'rm -f /usr/local/bin/{docker-entrypoint.sh,yarn*}' \
-  && bash -c 'rm -f /usr/local/{CHANGELOG.md,LICENSE,README.md}' \
+  && bash -c 'mv /usr/local/{CHANGELOG.md,LICENSE,README.md} \
+    /usr/local/share/doc/node' \
   ## Enable corepack (Yarn, pnpm)
   && corepack enable \
   ## Install nFPM

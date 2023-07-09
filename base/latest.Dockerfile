@@ -1,15 +1,15 @@
 ARG BASE_IMAGE=debian
-ARG BASE_IMAGE_TAG=bullseye
+ARG BASE_IMAGE_TAG=12
 ARG BUILD_ON_IMAGE=glcr.b-data.ch/julia/ver
 ARG JULIA_VERSION
 ARG CUDA_IMAGE_FLAVOR
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
-ARG JUPYTERHUB_VERSION=4.0.0
-ARG JUPYTERLAB_VERSION=3.6.4
+ARG JUPYTERHUB_VERSION=4.0.1
+ARG JUPYTERLAB_VERSION=3.6.5
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.13.0
+ARG CODE_SERVER_VERSION=4.14.1
 ARG GIT_VERSION=2.41.0
 ARG GIT_LFS_VERSION=3.3.0
 ARG PANDOC_VERSION=3.1.1
@@ -173,7 +173,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     sed -i 's/.*pam_limits.so/#&/g' /etc/pam.d/sudo-i; \
   fi \
   ## Add user
-  && useradd -l -m -s /bin/bash -N -u ${NB_UID} ${NB_USER} \
+  && useradd -l -m -s $(which zsh) -N -u ${NB_UID} ${NB_USER} \
   && mkdir -p /var/backups/skel \
   && chown ${NB_UID}:${NB_GID} /var/backups/skel \
   ## Install Tini
@@ -204,6 +204,8 @@ RUN mkdir /opt/code-server \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-12.7.0.vsix \
   && curl -sLO https://dl.b-data.ch/vsix/piotrpalarz.vscode-gitignore-generator-1.0.3.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator-1.0.3.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/mutantdino.resourcemonitor-1.0.7.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension mutantdino.resourcemonitor-1.0.7.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-toolsai.jupyter \
@@ -223,7 +225,8 @@ RUN mkdir /opt/code-server \
     ${HOME}/.local
 
 ## Install JupyterLab
-RUN pip install \
+RUN export PIP_BREAK_SYSTEM_PACKAGES=1 \
+  && pip install \
     jupyter-server-proxy \
     jupyterhub==${JUPYTERHUB_VERSION} \
     jupyterlab==${JUPYTERLAB_VERSION} \
@@ -244,11 +247,13 @@ RUN pip install \
 
 ## Install Julia related stuff
 RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
-  ## Install the Julia kernel for JupyterLab
+  ## Install the Julia kernel for Jupyter
   && julia -e 'using Pkg; Pkg.add(["IJulia", "Revise", "LanguageServer"]); Pkg.precompile()' \
   ## Install CUDA
   && if [ ! -z "$CUDA_IMAGE" ]; then \
-    julia -e 'using Pkg; Pkg.add("CUDA"); Pkg.precompile()'; \
+    julia -e 'using Pkg; Pkg.add("CUDA")'; \
+    julia -e 'using CUDA; CUDA.set_runtime_version!("local")'; \
+    julia -e 'using CUDA; CUDA.precompile_runtime()'; \
   fi \
   && julia -e 'using Pkg; Pkg.add(readdir("$(ENV["JULIA_DEPOT_PATH"])/packages"))' \
   && rm -rf ${JULIA_DEPOT_PATH}/registries/* \
