@@ -249,16 +249,17 @@ RUN export PIP_BREAK_SYSTEM_PACKAGES=1 \
 RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
   ## Install the Julia kernel for Jupyter
   && julia -e 'using Pkg; Pkg.add(["IJulia", "Revise", "LanguageServer"]); Pkg.precompile()' \
+  && mv ${HOME}/.local/share/jupyter/kernels/julia* /usr/local/share/jupyter/kernels/ \
   ## Install CUDA
   && if [ ! -z "$CUDA_IMAGE" ]; then \
     julia -e 'using Pkg; Pkg.add("CUDA")'; \
     julia -e 'using CUDA; CUDA.set_runtime_version!("local")'; \
     julia -e 'using CUDA; CUDA.precompile_runtime()'; \
   fi \
+  ## Make installed packages available system-wide
   && julia -e 'using Pkg; Pkg.add(readdir("$(ENV["JULIA_DEPOT_PATH"])/packages"))' \
   && rm -rf ${JULIA_DEPOT_PATH}/registries/* \
   && chmod -R ugo+rx ${JULIA_DEPOT_PATH} \
-  && mv ${HOME}/.local/share/jupyter/kernels/julia* /usr/local/share/jupyter/kernels/ \
   ## SymbolServer: Change permissions on store folder
   && s3f=$(ls $JULIA_DEPOT_PATH/packages/SymbolServer) \
   && cd ${JULIA_DEPOT_PATH}/packages/SymbolServer/${s3f} \
