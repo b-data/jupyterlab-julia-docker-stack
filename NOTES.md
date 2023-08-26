@@ -1,12 +1,5 @@
 # Notes
 
-The programming support for NVIDIA GPUs in Julia is provided by the
-[CUDA.jl](https://github.com/JuliaGPU/CUDA.jl) package. It does not require the
-entire CUDA toolkit installed, as it will automatically be downloaded when the
-package is first used.  
-:information_source: This docker stack is derived from a CUDA image since Python
-packages may require the CUDA toolkit.
-
 This docker stack uses modified startup scripts from
 [jupyter/docker-stacks](https://github.com/jupyter/docker-stacks).  
 :information_source: Nevertheless, all [Docker Options](https://github.com/jupyter/docker-stacks/blob/main/docs/using/common.md#docker-options)
@@ -27,10 +20,10 @@ The following startup scripts are put in place:
 
 * [$JULIA_PATH/etc/julia/startup.jl](base/conf/julia/etc/julia/startup.jl) to add the
   `LOAD_PATH` of the pre-installed packages
-* [$HOME/.julia/config/startup.jl](base/conf/user/var/backups/skel/.julia/config/startup.jl)
+* [~/.julia/config/startup.jl](base/conf/user/var/backups/skel/.julia/config/startup.jl)
   to start [Revise](https://github.com/timholy/Revise.jl) and activate either
   the project environment or package directory.
-* [$HOME/.julia/config/startup_ijulia.jl](base/conf/user/var/backups/skel/.julia/config/startup_ijulia.jl)
+* [~/.julia/config/startup_ijulia.jl](base/conf/user/var/backups/skel/.julia/config/startup_ijulia.jl)
   to register MIME type `application/pdf` to IJulia.
 
 ### Jupyter startup scripts
@@ -113,11 +106,8 @@ are installed.
 
 ### Default
 
-* [Terminal IPython](base/conf/ipython/usr/local/etc/ipython/ipython_config.py):
-  * Only enable figure formats `svg` and `pdf` for Terminal IPython.
-* [IPython kernel](base/conf/ipython/usr/local/etc/ipython/ipython_kernel_config.py):
-  * Only enable figure formats `svg` and `pdf` for IPython Kernel (Jupyter
-    Notebooks).
+* [IPython](base/conf/ipython/usr/local/etc/ipython/ipython_config.py):
+  * Only enable figure formats `svg` and `pdf` for IPython.
 * [JupyterLab](base/conf/jupyterlab/usr/local/share/jupyter/lab/settings/overrides.json):
   * Theme > Selected Theme: JupyterLab Dark
   * Terminal > Font family: MesloLGS NF
@@ -159,10 +149,7 @@ are installed.
 
 ### Customise
 
-* Terminal IPython: Create file `~/.ipython/profile_default/ipython_config.py`
-  * Valid figure formats: `png`, `retina`, `jpeg`, `svg`, `pdf`.
-* IPython kernel: Create file
-  `~/.ipython/profile_default/ipython_kernel_config.py`
+* IPython: Create file `~/.ipython/profile_default/ipython_config.py`
   * Valid figure formats: `png`, `retina`, `jpeg`, `svg`, `pdf`.
 * JupyterLab: Settings > Advanced Settings Editor
 * code-server: Manage > Settings
@@ -177,9 +164,9 @@ are installed.
 
 The Python version is selected as follows:
 
-* The latest [Python version numba is compatible with](https://numba.readthedocs.io/en/stable/user/installing.html#compatibility).
+* The latest [Python version numba is compatible with](https://numba.readthedocs.io/en/stable/user/installing.html#numba-support-info).
 
-This Python version is installed at `/user/local/bin`.
+This Python version is installed at `/usr/local/bin`.
 
 # Additional notes on CUDA
 
@@ -211,11 +198,13 @@ and/or pnpm:
 * [Installation | Yarn - Package Manager > Updating the global Yarn version](https://yarnpkg.com/getting-started/install#updating-the-global-yarn-version)
 * [Installation | pnpm > Using Corepack](https://pnpm.io/installation#using-corepack)
 
-## OS Python
+## System Python
 
-Package `libsecret-1-dev` depends on `python3` from the OS' package repository.
+Package `libsecret-1-dev` depends on `python3` from the system's package
+repository.
 
-The OS' Python version is installed at `/usr/bin`.  
+The system's Python version is installed at `/usr/bin`.  
 
-:information_source: Because the [recent Python version](#python) is installed
-at `/usr/local/bin`, it takes precedence over the OS' Python version.
+:information_source: Because [a more recent Python version](#python) is
+installed at `/usr/local/bin`, it takes precedence over the system's Python
+version.
