@@ -36,18 +36,18 @@ if [ "$(id -u)" == 0 ] ; then
   # Install user-specific startup files for Julia and IJulia
   su $NB_USER -c "mkdir -p .julia/config"
   if [[ ! -f ".julia/config/startup_ijulia.jl" ]]; then
-    su $NB_USER -c "cp -a /var/backups/skel/.julia/config/startup_ijulia.jl \
+    su $NB_USER -c "cp -a ${CP_OPT} /var/backups/skel/.julia/config/startup_ijulia.jl \
       .julia/config/startup_ijulia.jl"
   fi
   if [[ ! -f ".julia/config/startup.jl" ]]; then
-    su $NB_USER -c "cp -a /var/backups/skel/.julia/config/startup.jl \
+    su $NB_USER -c "cp -a ${CP_OPT} /var/backups/skel/.julia/config/startup.jl \
       .julia/config/startup.jl"
   fi
 
   # Update code-server settings
   su $NB_USER -c "mkdir -p /home/$NB_USER/.local/share/code-server/User"
   if [[ ! -f "/home/$NB_USER/.local/share/code-server/User/settings.json" ]]; then
-    su $NB_USER -c "cp -a /var/backups/skel/.local/share/code-server/User/settings.json \
+    su $NB_USER -c "cp -a ${CP_OPT} /var/backups/skel/.local/share/code-server/User/settings.json \
       /home/$NB_USER/.local/share/code-server/User/settings.json"
   fi
 

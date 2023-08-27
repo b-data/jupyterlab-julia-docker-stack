@@ -200,7 +200,28 @@ current value of `${NB_UID}` and `${NB_GID}`.
 
 The server logs appear in the terminal.
 
-**Using Docker Desktop**
+#### Using Podman (rootless mode, 1.9.3+)
+
+Create an empty home directory:
+
+```bash
+mkdir jupyterlab-root
+```
+
+Use the following command to run the container as `root`:
+
+```bash
+podman run -it --rm \
+  -p 8888:8888 \
+  -u root \
+  -v "${PWD}/jupyterlab-root":/home/root \
+  -e NB_USER=root \
+  -e NB_UID=0 \
+  -e NB_GID=0 \
+  IMAGE[:MAJOR[.MINOR[.PATCH]]] start-notebook.sh --allow-root
+```
+
+#### Using Docker Desktop
 
 [Creating a home directory](#create-home-directory) *might* not be required.
 Also
@@ -221,7 +242,7 @@ docker run -it --rm \
 What makes this project different:
 
 1. Multi-arch: `linux/amd64`, `linux/arm64/v8`  
-   :point_right: Since Julia v1.5.4 (2021-03-11)  
+   :point_right: Since Julia 1.5.4 (2021-03-11)  
    :information_source: Runs on Apple M series using Docker Desktop.
 1. Base image: [Debian](https://hub.docker.com/_/debian) instead of
    [Ubuntu](https://hub.docker.com/_/ubuntu)  
