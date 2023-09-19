@@ -254,7 +254,7 @@ RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
   ## Install CUDA
   && if [ ! -z "$CUDA_IMAGE" ]; then \
     julia -e 'using Pkg; Pkg.add("CUDA")'; \
-    julia -e 'using CUDA; CUDA.set_runtime_version!("local")'; \
+    julia -e "using CUDA; CUDA.set_runtime_version!(v\"${CUDA_VERSION%.*}\"; local_toolkit=true)"; \
     julia -e 'using CUDA; CUDA.precompile_runtime()'; \
   fi \
   ## Make installed packages available system-wide
