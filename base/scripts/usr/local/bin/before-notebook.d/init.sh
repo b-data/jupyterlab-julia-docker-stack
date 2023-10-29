@@ -34,14 +34,16 @@ if [ "$(id -u)" == 0 ] ; then
   fi
 
   # Install user-specific startup files for Julia and IJulia
-  su $NB_USER -c "mkdir -p .julia/config"
-  if [[ ! -f ".julia/config/startup_ijulia.jl" ]]; then
+  su $NB_USER -c "mkdir -p /home/$NB_USER/.julia/config"
+  if [[ ! -f "/home/$NB_USER/.julia/config/startup_ijulia.jl" ]]; then
     su $NB_USER -c "cp ${CP_OPTS:--a} /var/backups/skel/.julia/config/startup_ijulia.jl \
-      .julia/config/startup_ijulia.jl"
+      /home/$NB_USER/.julia/config/startup_ijulia.jl"
+    chown :$NB_GID "/home/$NB_USER/.julia/config/startup_ijulia.jl"
   fi
-  if [[ ! -f ".julia/config/startup.jl" ]]; then
+  if [[ ! -f "/home/$NB_USER/.julia/config/startup.jl" ]]; then
     su $NB_USER -c "cp ${CP_OPTS:--a} /var/backups/skel/.julia/config/startup.jl \
-      .julia/config/startup.jl"
+      /home/$NB_USER/.julia/config/startup.jl"
+    chown :$NB_GID "/home/$NB_USER/.julia/config/startup.jl"
   fi
 
   # Update code-server settings
@@ -49,6 +51,7 @@ if [ "$(id -u)" == 0 ] ; then
   if [[ ! -f "/home/$NB_USER/.local/share/code-server/User/settings.json" ]]; then
     su $NB_USER -c "cp ${CP_OPTS:--a} /var/backups/skel/.local/share/code-server/User/settings.json \
       /home/$NB_USER/.local/share/code-server/User/settings.json"
+    chown :$NB_GID "/home/$NB_USER/.local/share/code-server/User/settings.json"
   fi
 
   su $NB_USER -c "mv /home/$NB_USER/.local/share/code-server/User/settings.json \
@@ -78,14 +81,14 @@ else
   fi
 
   # Install user-specific startup files for Julia and IJulia
-  mkdir -p .julia/config
-  if [[ ! -f ".julia/config/startup_ijulia.jl" ]]; then
+  mkdir -p /home/$NB_USER/.julia/config
+  if [[ ! -f "/home/$NB_USER/.julia/config/startup_ijulia.jl" ]]; then
     cp -a /var/backups/skel/.julia/config/startup_ijulia.jl \
-      .julia/config/startup_ijulia.jl
+      /home/$NB_USER/.julia/config/startup_ijulia.jl
   fi
-  if [[ ! -f ".julia/config/startup.jl" ]]; then
+  if [[ ! -f "/home/$NB_USER/.julia/config/startup.jl" ]]; then
     cp -a /var/backups/skel/.julia/config/startup.jl \
-      .julia/config/startup.jl
+      /home/$NB_USER/.julia/config/startup.jl
   fi
 
   # Update code-server settings
