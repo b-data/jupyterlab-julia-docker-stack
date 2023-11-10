@@ -64,6 +64,8 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends nfpm \
   ## Install code-server extensions
   && code-server --extensions-dir "$CODE_BUILTIN_EXTENSIONS_DIR" \
+    --install-extension DavidAnson.vscode-markdownlint \
+  && code-server --extensions-dir "$CODE_BUILTIN_EXTENSIONS_DIR" \
     --install-extension dbaeumer.vscode-eslint \
   && code-server --extensions-dir "$CODE_BUILTIN_EXTENSIONS_DIR" \
     --install-extension esbenp.prettier-vscode \
