@@ -17,6 +17,7 @@
   "gitlens.showWhatsNewAfterUpgrades": false,
   "julia.enableCrashReporter": false,
   "julia.enableTelemetry": false,
+  "python.languageServer": "Jedi",
   "resmon.show.battery": false,
   "resmon.show.cpufreq": false,
   "telemetry.telemetryLevel": "off",
