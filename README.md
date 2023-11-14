@@ -17,6 +17,8 @@ Images considered stable for Julia versions ≥ 1.7.3.
 
 :microscope: Check out `jupyterlab/julia/pubtools` at https://demo.jupyter.b-data.ch.
 
+![Screenshot](assets/screenshot.png)
+
 **Build chain**
 
 base → pubtools
