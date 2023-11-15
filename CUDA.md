@@ -11,6 +11,8 @@ Images available for Julia versions ≥ 1.8.5.
 https://demo.cuda.jupyter.b-data.ch.  
 :point_right: You can ask [b-data](mailto:request@b-data.ch?subject=[CUDA%20Jupyter]%20Request%20to%20whitelist%20GitHub%20account) to whitelist your GitHub account for access.
 
+![CUDA screenshot](assets/cuda-screenshot.png)
+
 **Build chain**
 
 The same as the
@@ -74,7 +76,7 @@ cd base && docker build \
   --build-arg BASE_IMAGE=ubuntu \
   --build-arg BASE_IMAGE_TAG=22.04 \
   --build-arg BUILD_ON_IMAGE=glcr.b-data.ch/cuda/julia/ver \
-  --build-arg JULIA_VERSION=1.9.2 \
+  --build-arg JULIA_VERSION=1.9.3 \
   --build-arg CUDA_IMAGE_FLAVOR=devel \
   -t jupyterlab/cuda/julia/base \
   -f latest.Dockerfile .

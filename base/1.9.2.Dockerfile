@@ -14,6 +14,8 @@ ARG GIT_VERSION=2.42.0
 ARG GIT_LFS_VERSION=3.4.0
 ARG PANDOC_VERSION=3.1.1
 
+ARG JULIA_CUDA_PACKAGE_VERSION=4.4.1
+
 FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} as files
 
 ARG NB_UID
@@ -60,6 +62,8 @@ ARG GIT_VERSION
 ARG GIT_LFS_VERSION
 ARG PANDOC_VERSION
 ARG BUILD_START
+
+ARG JULIA_CUDA_PACKAGE_VERSION
 
 ARG CODE_WORKDIR
 
@@ -252,7 +256,7 @@ RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
   && mv ${HOME}/.local/share/jupyter/kernels/julia* /usr/local/share/jupyter/kernels/ \
   ## Install CUDA
   && if [ ! -z "$CUDA_IMAGE" ]; then \
-    julia -e 'using Pkg; Pkg.add("CUDA")'; \
+    julia -e "using Pkg; Pkg.add(name=\"CUDA\", version=\"$JULIA_CUDA_PACKAGE_VERSION\")"; \
     julia -e 'using CUDA; CUDA.set_runtime_version!("local")'; \
     julia -e 'using CUDA; CUDA.precompile_runtime()'; \
   fi \
