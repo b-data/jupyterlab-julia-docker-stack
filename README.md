@@ -82,7 +82,7 @@ The following extensions are pre-installed for **code-server**:
 * [Quarto](https://open-vsx.org/extension/quarto/quarto)  
   :information_source: pubtools image
 * Resource Monitor (1.9.1+)
-* [ShellCheck](https://open-vsx.org/extension/timonwong/shellcheck)
+* [ShellCheck](https://open-vsx.org/extension/timonwong/shellcheck)  
   :information_source: devtools and docker subtags (1.9.2+)
 * [YAML](https://open-vsx.org/extension/redhat/vscode-yaml)
 
