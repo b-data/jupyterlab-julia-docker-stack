@@ -12,12 +12,12 @@ if [ "$(id -u)" == 0 ] ; then
   # Update timezone if needed
   if [ "$TZ" != "Etc/UTC" ]; then
     echo "Setting TZ to $TZ"
-    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
-      && echo $TZ > /etc/timezone
+    ln -snf "/usr/share/zoneinfo/$TZ" /etc/localtime \
+      && echo "$TZ" > /etc/timezone
   fi
 
   # Add/Update locale if needed
-  if [ ! -z "$LANGS" ]; then
+  if [ -n "$LANGS" ]; then
     for i in $LANGS; do
       sed -i "s/# $i/$i/g" /etc/locale.gen
     done
@@ -25,43 +25,49 @@ if [ "$(id -u)" == 0 ] ; then
   if [ "$LANG" != "en_US.UTF-8" ]; then
     sed -i "s/# $LANG/$LANG/g" /etc/locale.gen
   fi
-  if [[ "$LANG" != "en_US.UTF-8" || ! -z "$LANGS" ]]; then
+  if [[ "$LANG" != "en_US.UTF-8" || -n "$LANGS" ]]; then
     locale-gen
   fi
   if [ "$LANG" != "en_US.UTF-8" ]; then
     echo "Setting LANG to $LANG"
-    update-locale --reset LANG=$LANG
+    update-locale --reset LANG="$LANG"
   fi
 
   # Install user-specific startup files for Julia and IJulia
-  su $NB_USER -c "mkdir -p /home/$NB_USER/.julia/config"
+  su "$NB_USER" -c "mkdir -p /home/$NB_USER/.julia/config"
   if [[ ! -f "/home/$NB_USER/.julia/config/startup_ijulia.jl" ]]; then
-    su $NB_USER -c "cp ${CP_OPTS:--a} /var/backups/skel/.julia/config/startup_ijulia.jl \
+    su "$NB_USER" -c "cp ${CP_OPTS:--a} /var/backups/skel/.julia/config/startup_ijulia.jl \
       /home/$NB_USER/.julia/config/startup_ijulia.jl"
-    chown :$NB_GID "/home/$NB_USER/.julia/config/startup_ijulia.jl"
+    chown :"$NB_GID" "/home/$NB_USER/.julia/config/startup_ijulia.jl"
   fi
   if [[ ! -f "/home/$NB_USER/.julia/config/startup.jl" ]]; then
-    su $NB_USER -c "cp ${CP_OPTS:--a} /var/backups/skel/.julia/config/startup.jl \
+    su "$NB_USER" -c "cp ${CP_OPTS:--a} /var/backups/skel/.julia/config/startup.jl \
       /home/$NB_USER/.julia/config/startup.jl"
-    chown :$NB_GID "/home/$NB_USER/.julia/config/startup.jl"
+    chown :"$NB_GID" "/home/$NB_USER/.julia/config/startup.jl"
   fi
 
+  CS_USD="/home/$NB_USER/.local/share/code-server/User"
+  # Install code-server settings
+  su "$NB_USER" -c "mkdir -p $CS_USD"
+  if [[ ! -f "$CS_USD/settings.json" ]]; then
+    su "$NB_USER" -c "cp ${CP_OPTS:--a} /var/backups/skel/.local/share/code-server/User/settings.json \
+      $CS_USD/settings.json"
+    chown :"$NB_GID" "$CS_USD/settings.json"
+  fi
   # Update code-server settings
-  su $NB_USER -c "mkdir -p /home/$NB_USER/.local/share/code-server/User"
-  if [[ ! -f "/home/$NB_USER/.local/share/code-server/User/settings.json" ]]; then
-    su $NB_USER -c "cp ${CP_OPTS:--a} /var/backups/skel/.local/share/code-server/User/settings.json \
-      /home/$NB_USER/.local/share/code-server/User/settings.json"
-    chown :$NB_GID "/home/$NB_USER/.local/share/code-server/User/settings.json"
+  su "$NB_USER" -c "mv $CS_USD/settings.json $CS_USD/settings.json.bak"
+  su "$NB_USER" -c "sed -i ':a;N;\$!ba;s/,\n\}/\n}/g' $CS_USD/settings.json.bak"
+  if [[ $(jq . "$CS_USD/settings.json.bak" 2> /dev/null) ]]; then
+    su "$NB_USER" -c "jq -s '.[0] * .[1]' \
+      /var/backups/skel/.local/share/code-server/User/settings.json \
+      $CS_USD/settings.json.bak > \
+      $CS_USD/settings.json"
+  else
+    su "$NB_USER" -c "mv $CS_USD/settings.json.bak $CS_USD/settings.json"
   fi
 
-  su $NB_USER -c "mv /home/$NB_USER/.local/share/code-server/User/settings.json \
-    /home/$NB_USER/.local/share/code-server/User/settings.json.bak"
-  su $NB_USER -c "sed -i ':a;N;\$!ba;s/,\n\}/\n}/g' \
-    /home/$NB_USER/.local/share/code-server/User/settings.json.bak"
-  su $NB_USER -c "jq -s '.[0] * .[1]' \
-    /var/backups/skel/.local/share/code-server/User/settings.json \
-    /home/$NB_USER/.local/share/code-server/User/settings.json.bak > \
-    /home/$NB_USER/.local/share/code-server/User/settings.json"
+  # Remove old .zcompdump files
+  rm -f "/home/$NB_USER/.zcompdump"*
 else
   # Warn if the user wants to change the timezone but hasn't started the
   # container as root.
@@ -71,7 +77,7 @@ else
 
   # Warn if the user wants to change the locale but hasn't started the
   # container as root.
-  if [[ ! -z "$LANGS" ]]; then
+  if [[ -n "$LANGS" ]]; then
     echo "WARNING: Container must be started as root to add locale(s)!"
   fi
   if [[ "$LANG" != "en_US.UTF-8" ]]; then
@@ -81,32 +87,35 @@ else
   fi
 
   # Install user-specific startup files for Julia and IJulia
-  mkdir -p /home/$NB_USER/.julia/config
-  if [[ ! -f "/home/$NB_USER/.julia/config/startup_ijulia.jl" ]]; then
+  mkdir -p "$HOME/.julia/config"
+  if [[ ! -f "$HOME/.julia/config/startup_ijulia.jl" ]]; then
     cp -a /var/backups/skel/.julia/config/startup_ijulia.jl \
-      /home/$NB_USER/.julia/config/startup_ijulia.jl
+      "$HOME/.julia/config/startup_ijulia.jl"
   fi
-  if [[ ! -f "/home/$NB_USER/.julia/config/startup.jl" ]]; then
+  if [[ ! -f "$HOME/.julia/config/startup.jl" ]]; then
     cp -a /var/backups/skel/.julia/config/startup.jl \
-      /home/$NB_USER/.julia/config/startup.jl
+      "$HOME/.julia/config/startup.jl"
   fi
 
-  # Update code-server settings
-  mkdir -p /home/$NB_USER/.local/share/code-server/User
-  if [[ ! -f "/home/$NB_USER/.local/share/code-server/User/settings.json" ]]; then
+  CS_USD="$HOME/.local/share/code-server/User"
+  # Install code-server settings
+  mkdir -p "$CS_USD"
+  if [[ ! -f "$CS_USD/settings.json" ]]; then
     cp -a /var/backups/skel/.local/share/code-server/User/settings.json \
-      /home/$NB_USER/.local/share/code-server/User/settings.json
+      "$CS_USD/settings.json"
+  fi
+  # Update code-server settings
+  mv "$CS_USD/settings.json" "$CS_USD/settings.json.bak"
+  sed -i ':a;N;$!ba;s/,\n\}/\n}/g' "$CS_USD/settings.json.bak"
+  if [[ $(jq . "$CS_USD/settings.json.bak" 2> /dev/null) ]]; then
+    jq -s '.[0] * .[1]' \
+      /var/backups/skel/.local/share/code-server/User/settings.json \
+      "$CS_USD/settings.json.bak" > \
+      "$CS_USD/settings.json"
+  else
+    mv "$CS_USD/settings.json.bak" "$CS_USD/settings.json"
   fi
 
-  mv /home/$NB_USER/.local/share/code-server/User/settings.json \
-    /home/$NB_USER/.local/share/code-server/User/settings.json.bak
-  sed -i ':a;N;$!ba;s/,\n\}/\n}/g' \
-    /home/$NB_USER/.local/share/code-server/User/settings.json.bak
-  jq -s '.[0] * .[1]' \
-    /var/backups/skel/.local/share/code-server/User/settings.json \
-    /home/$NB_USER/.local/share/code-server/User/settings.json.bak > \
-    /home/$NB_USER/.local/share/code-server/User/settings.json
+  # Remove old .zcompdump files
+  rm -f "$HOME/.zcompdump"*
 fi
-
-# Remove old .zcompdump files
-rm -f /home/$NB_USER/.zcompdump*
