@@ -157,8 +157,10 @@ if [ "$(id -u)" == 0 ] ; then
             # shellcheck disable=SC2086
             chown ${CHOWN_HOME_OPTS} "${NB_UID}:${NB_GID}" "/home/${NB_USER}${DOMAIN:+@$DOMAIN}"
             # Symlink temporarily mounted filesystems to home directory
-            ln -snf /mnt "/home/${NB_USER}${DOMAIN:+@$DOMAIN}/mnt"
-            chown -h "${NB_UID}:${NB_GID}" "/home/${NB_USER}${DOMAIN:+@$DOMAIN}/mnt"
+            if [[ "$(ls -A /mnt 2> /dev/null)" != "" ]]; then
+                ln -snf /mnt "/home/${NB_USER}${DOMAIN:+@$DOMAIN}/mnt"
+                chown -h "${NB_UID}:${NB_GID}" "/home/${NB_USER}${DOMAIN:+@$DOMAIN}/mnt"
+            fi
             # Symlink pam_mount configuration to home directory
             if [[ -f /var/tmp/.pam_mount.conf.xml ]]; then
                 ln -sf /var/tmp/.pam_mount.conf.xml "/home/${NB_USER}${DOMAIN:+@$DOMAIN}/.pam_mount.conf.xml"
@@ -279,10 +281,6 @@ else
     # Warn if the user isn't able to write files to ${HOME}
     if [[ ! -w /home/jovyan ]]; then
         _log "WARNING: no write access to /home/jovyan. Try starting the container with group 'users' (100), e.g. using \"--group-add=users\"."
-    else
-        if [[ ! -L /home/jovyan/mnt ]]; then
-            ln -s /mnt /home/jovyan/mnt
-        fi
     fi
 
     # NOTE: This hook is run as the user we started the container as!
