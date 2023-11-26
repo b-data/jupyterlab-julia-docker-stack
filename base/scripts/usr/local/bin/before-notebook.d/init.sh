@@ -34,19 +34,19 @@ if [ "$(id -u)" == 0 ] ; then
   fi
 
   # Install user-specific startup files for Julia and IJulia
-  su "$NB_USER" -c "mkdir -p /home/$NB_USER/.julia/config"
-  if [[ ! -f "/home/$NB_USER/.julia/config/startup_ijulia.jl" ]]; then
+  su "$NB_USER" -c "mkdir -p /home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/config"
+  if [[ ! -f "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/config/startup_ijulia.jl" ]]; then
     su "$NB_USER" -c "cp ${CP_OPTS:--a} /var/backups/skel/.julia/config/startup_ijulia.jl \
-      /home/$NB_USER/.julia/config/startup_ijulia.jl"
-    chown :"$NB_GID" "/home/$NB_USER/.julia/config/startup_ijulia.jl"
+      /home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/config/startup_ijulia.jl"
+    chown :"$NB_GID" "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/config/startup_ijulia.jl"
   fi
-  if [[ ! -f "/home/$NB_USER/.julia/config/startup.jl" ]]; then
+  if [[ ! -f "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/config/startup.jl" ]]; then
     su "$NB_USER" -c "cp ${CP_OPTS:--a} /var/backups/skel/.julia/config/startup.jl \
-      /home/$NB_USER/.julia/config/startup.jl"
-    chown :"$NB_GID" "/home/$NB_USER/.julia/config/startup.jl"
+      /home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/config/startup.jl"
+    chown :"$NB_GID" "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/config/startup.jl"
   fi
 
-  CS_USD="/home/$NB_USER/.local/share/code-server/User"
+  CS_USD="/home/$NB_USER${DOMAIN:+@$DOMAIN}/.local/share/code-server/User"
   # Install code-server settings
   su "$NB_USER" -c "mkdir -p $CS_USD"
   if [[ ! -f "$CS_USD/settings.json" ]]; then
@@ -67,7 +67,7 @@ if [ "$(id -u)" == 0 ] ; then
   fi
 
   # Remove old .zcompdump files
-  rm -f "/home/$NB_USER/.zcompdump"*
+  rm -f "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.zcompdump"*
 else
   # Warn if the user wants to change the timezone but hasn't started the
   # container as root.
