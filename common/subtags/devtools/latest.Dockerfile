@@ -44,11 +44,11 @@ RUN apt-get update \
   && if [ -n "$PYTHON_VERSION" ]; then \
     ## make some useful symlinks that are expected to exist
     ## ("/usr/bin/python" and friends)
-    for src in pydoc3 python3 python3-config; do \
+    for src in pydoc3 python3; do \
       dst="$(echo "$src" | tr -d 3)"; \
-      if [ -s "/usr/bin/$src" ] && [ ! -e "/usr/bin/$dst" ]; then \
-        ln -svT "$src" "/usr/bin/$dst"; \
-      fi \
+      [ -s "/usr/bin/$src" ]; \
+      [ ! -e "/usr/bin/$dst" ]; \
+      ln -svT "$src" "/usr/bin/$dst"; \
     done; \
   fi \
   ## Clean up Node.js installation
