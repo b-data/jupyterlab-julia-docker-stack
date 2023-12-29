@@ -82,7 +82,7 @@ The following extensions are pre-installed for **code-server**:
 * [Quarto](https://open-vsx.org/extension/quarto/quarto)  
   :information_source: pubtools image
 * Resource Monitor (1.9.1+)
-* [ShellCheck](https://open-vsx.org/extension/timonwong/shellcheck)
+* [ShellCheck](https://open-vsx.org/extension/timonwong/shellcheck)  
   :information_source: devtools and docker subtags (1.9.2+)
 * [YAML](https://open-vsx.org/extension/redhat/vscode-yaml)
 
@@ -131,7 +131,7 @@ To install docker, follow the instructions for your platform:
 
 ```bash
 cd base && docker build \
-  --build-arg JULIA_VERSION=1.9.3 \
+  --build-arg JULIA_VERSION=1.9.4 \
   -t jupyterlab/julia/base \
   -f latest.Dockerfile .
 ```
@@ -213,7 +213,7 @@ current value of `${NB_UID}` and `${NB_GID}`.
 
 The server logs appear in the terminal.
 
-#### Using Podman (rootless mode, 1.9.3+)
+#### Using Podman (rootless mode, 1.9.4+)
 
 Create an empty home directory:
 
