@@ -261,6 +261,14 @@ RUN export PIP_BREAK_SYSTEM_PACKAGES=1 \
 
 ## Install Julia related stuff
 RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
+  ## Determine JULIA_CPU_TARGETs for different architectures
+  ## https://github.com/JuliaCI/julia-buildkite/blob/main/utilities/build_envs.sh
+  && dpkgArch="$(dpkg --print-architecture)" \
+  && case "${dpkgArch}" in \
+    amd64) export JULIA_CPU_TARGET="generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1)" ;; \
+    arm64) export JULIA_CPU_TARGET="generic;cortex-a57;thunderx2t99;carmel" ;; \
+    *) echo "Unknown target processor architecture '${dpkgArch}'" >&2; exit 1 ;; \
+  esac \
   ## Install the Julia kernel for Jupyter
   && julia -e 'using Pkg; Pkg.add(["IJulia", "Revise", "LanguageServer"]); Pkg.precompile()' \
   && mv ${HOME}/.local/share/jupyter/kernels/julia* /usr/local/share/jupyter/kernels/ \
