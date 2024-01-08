@@ -37,6 +37,9 @@ if [ "$(id -u)" == 0 ] ; then
   su "$NB_USER" -c "mkdir -p /home/$NB_USER${DOMAIN:+@$DOMAIN}/projects"
   su "$NB_USER" -c "mkdir -p /home/$NB_USER${DOMAIN:+@$DOMAIN}/workspaces"
 
+  ## Create default environment folder for Julia
+  su "$NB_USER" -c "mkdir -p /home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/environments/v${JULIA_VERSION%.*}"
+
   # Install user-specific startup files for Julia and IJulia
   su "$NB_USER" -c "mkdir -p /home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/config"
   if [[ ! -f "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/config/startup_ijulia.jl" ]]; then
@@ -93,6 +96,9 @@ else
   ## Create user's projects and workspaces folder
   mkdir -p "$HOME/projects"
   mkdir -p "$HOME/workspaces"
+
+  ## Create default environment folder for Julia
+  mkdir -p "$HOME/.julia/environments/v${JULIA_VERSION%.*}"
 
   # Install user-specific startup files for Julia and IJulia
   mkdir -p "$HOME/.julia/config"

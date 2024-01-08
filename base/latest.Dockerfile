@@ -25,14 +25,16 @@ RUN mkdir /files
 
 COPY assets /files
 COPY conf/ipython /files
-COPY conf/julia /files/${JULIA_PATH}
+COPY conf/julia/etc /files/etc
+COPY conf/julia/JULIA_PATH /files/${JULIA_PATH}
 COPY conf/jupyter /files
 COPY conf/jupyterlab /files
 COPY conf/shell /files
 COPY conf/user /files
 COPY scripts /files
 
-RUN cp -a /files/etc/skel/. /files/var/backups/skel \
+RUN mkdir -p "/files/etc/skel/.julia/environments/v${JULIA_VERSION%.*}" \
+  && cp -a /files/etc/skel/. /files/var/backups/skel \
   && chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
   ## Ensure file modes are correct when using CI
   ## Otherwise set to 777 in the target image
