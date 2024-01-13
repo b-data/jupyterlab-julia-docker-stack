@@ -15,7 +15,8 @@ Images considered stable for Julia versions ≥ 1.7.3.
 :point_right: The current state may eventually be backported to versions ≥
 1.5.4.
 
-:microscope: Check out `jupyterlab/julia/pubtools` at https://demo.jupyter.b-data.ch.
+:microscope: Check out `jupyterlab/julia/pubtools` at
+https://demo.jupyter.b-data.ch.
 
 ![Screenshot](assets/screenshot.png)
 
@@ -110,6 +111,7 @@ The following extensions are pre-installed for **code-server**:
 * [Usage](#usage)
 * [Similar project](#similar-project)
 * [Contributing](#contributing)
+* [Support](#support)
 * [License](#license)
 
 ## Prerequisites
