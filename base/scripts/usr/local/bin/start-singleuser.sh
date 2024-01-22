@@ -11,4 +11,4 @@ fi
 
 echo "Executing: jupyterhub-singleuser" "${NOTEBOOK_ARGS}" "$@"
 # shellcheck disable=SC1091,SC2086
-. jupyterhub-singleuser ${NOTEBOOK_ARGS} "$@"
+exec jupyterhub-singleuser ${NOTEBOOK_ARGS} "$@"
