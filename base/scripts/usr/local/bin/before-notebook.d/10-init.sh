@@ -37,6 +37,9 @@ if [ "$(id -u)" == 0 ] ; then
   su "$NB_USER" -c "mkdir -p /home/$NB_USER${DOMAIN:+@$DOMAIN}/projects"
   su "$NB_USER" -c "mkdir -p /home/$NB_USER${DOMAIN:+@$DOMAIN}/workspaces"
 
+  ## Create default environment folder for Julia
+  su "$NB_USER" -c "mkdir -p /home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/environments/v${JULIA_VERSION%.*}"
+
   # Install user-specific startup files for Julia and IJulia
   su "$NB_USER" -c "mkdir -p /home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/config"
   if [[ ! -f "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/config/startup_ijulia.jl" ]]; then
@@ -90,6 +93,13 @@ else
     LANG=en_US.UTF-8
   fi
 
+  ## Create user's projects and workspaces folder
+  mkdir -p "$HOME/projects"
+  mkdir -p "$HOME/workspaces"
+
+  ## Create default environment folder for Julia
+  mkdir -p "$HOME/.julia/environments/v${JULIA_VERSION%.*}"
+
   # Install user-specific startup files for Julia and IJulia
   mkdir -p "$HOME/.julia/config"
   if [[ ! -f "$HOME/.julia/config/startup_ijulia.jl" ]]; then
@@ -100,10 +110,6 @@ else
     cp -a /var/backups/skel/.julia/config/startup.jl \
       "$HOME/.julia/config/startup.jl"
   fi
-
-  ## Create user's projects and workspaces folder
-  mkdir -p "$HOME/projects"
-  mkdir -p "$HOME/workspaces"
 
   CS_USD="$HOME/.local/share/code-server/User"
   # Install code-server settings

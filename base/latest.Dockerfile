@@ -7,14 +7,14 @@ ARG CUDA_IMAGE_FLAVOR
 ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG JUPYTERHUB_VERSION=4.0.2
-ARG JUPYTERLAB_VERSION=4.0.9
+ARG JUPYTERLAB_VERSION=4.1.1
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.20.0
-ARG GIT_VERSION=2.43.0
+ARG CODE_SERVER_VERSION=4.21.1
+ARG GIT_VERSION=2.43.1
 ARG GIT_LFS_VERSION=3.4.1
-ARG PANDOC_VERSION=3.1.1
+ARG PANDOC_VERSION=3.1.11
 
-ARG JULIA_CUDA_PACKAGE_VERSION=5.1.1
+ARG JULIA_CUDA_PACKAGE_VERSION=5.2.0
 
 FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} as files
 
@@ -25,18 +25,17 @@ RUN mkdir /files
 
 COPY assets /files
 COPY conf/ipython /files
-COPY conf/julia /files/${JULIA_PATH}
+COPY conf/julia/etc /files/etc
+COPY conf/julia/JULIA_PATH /files/${JULIA_PATH}
 COPY conf/jupyter /files
 COPY conf/jupyterlab /files
 COPY conf/shell /files
 COPY conf/user /files
 COPY scripts /files
 
-RUN cp -a /files/etc/skel /files/home/${NB_USER} \
+RUN mkdir -p "/files/etc/skel/.julia/environments/v${JULIA_VERSION%.*}" \
   && cp -a /files/etc/skel/. /files/var/backups/skel \
-  && chown -R ${NB_UID}:${NB_GID} \
-    /files/home/${NB_USER} \
-    /files/var/backups/skel \
+  && chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
   ## Ensure file modes are correct when using CI
   ## Otherwise set to 777 in the target image
   && find /files -type d -exec chmod 755 {} \; \
@@ -261,6 +260,14 @@ RUN export PIP_BREAK_SYSTEM_PACKAGES=1 \
 
 ## Install Julia related stuff
 RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
+  ## Determine JULIA_CPU_TARGETs for different architectures
+  ## https://github.com/JuliaCI/julia-buildkite/blob/main/utilities/build_envs.sh
+  && dpkgArch="$(dpkg --print-architecture)" \
+  && case "${dpkgArch}" in \
+    amd64) export JULIA_CPU_TARGET="generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1)" ;; \
+    arm64) export JULIA_CPU_TARGET="generic;cortex-a57;thunderx2t99;carmel" ;; \
+    *) echo "Unknown target processor architecture '${dpkgArch}'" >&2; exit 1 ;; \
+  esac \
   ## Install the Julia kernel for Jupyter
   && julia -e 'using Pkg; Pkg.add(["IJulia", "Revise", "LanguageServer"]); Pkg.precompile()' \
   && mv ${HOME}/.local/share/jupyter/kernels/julia* /usr/local/share/jupyter/kernels/ \
@@ -322,5 +329,5 @@ COPY --from=files /files/var/backups/skel ${HOME}
 EXPOSE 8888
 
 ## Configure container startup
-ENTRYPOINT ["tini", "-g", "--"]
+ENTRYPOINT ["tini", "-g", "--", "start.sh"]
 CMD ["start-notebook.sh"]

@@ -8,8 +8,7 @@ GPU accelerated, multi-arch (`linux/amd64`, `linux/arm64/v8`) docker images:
 Images available for Julia versions ≥ 1.8.5.
 
 :microscope: Check out `jupyterlab/cuda/julia/pubtools` at
-https://demo.cuda.jupyter.b-data.ch.  
-:point_right: You can ask [b-data](mailto:request@b-data.ch?subject=[CUDA%20Jupyter]%20Request%20to%20whitelist%20GitHub%20account) to whitelist your GitHub account for access.
+https://demo.cuda.jupyter.b-data.ch.
 
 ![CUDA screenshot](assets/cuda-screenshot.png)
 
@@ -76,7 +75,7 @@ cd base && docker build \
   --build-arg BASE_IMAGE=ubuntu \
   --build-arg BASE_IMAGE_TAG=22.04 \
   --build-arg BUILD_ON_IMAGE=glcr.b-data.ch/cuda/julia/ver \
-  --build-arg JULIA_VERSION=1.9.4 \
+  --build-arg JULIA_VERSION=1.10.0 \
   --build-arg CUDA_IMAGE_FLAVOR=devel \
   -t jupyterlab/cuda/julia/base \
   -f latest.Dockerfile .
@@ -184,7 +183,8 @@ podman run -it --rm \
   -e NB_USER=root \
   -e NB_UID=0 \
   -e NB_GID=0 \
-  IMAGE[:MAJOR[.MINOR[.PATCH]]] start-notebook.sh --allow-root
+  -e NOTEBOOK_ARGS="--allow-root" \
+  IMAGE[:MAJOR[.MINOR[.PATCH]]]
 ```
 
 #### Using Docker Desktop

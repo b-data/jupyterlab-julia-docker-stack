@@ -15,7 +15,8 @@ Images considered stable for Julia versions ≥ 1.7.3.
 :point_right: The current state may eventually be backported to versions ≥
 1.5.4.
 
-:microscope: Check out `jupyterlab/julia/pubtools` at https://demo.jupyter.b-data.ch.
+:microscope: Check out `jupyterlab/julia/pubtools` at
+https://demo.jupyter.b-data.ch.
 
 ![Screenshot](assets/screenshot.png)
 
@@ -110,6 +111,7 @@ The following extensions are pre-installed for **code-server**:
 * [Usage](#usage)
 * [Similar project](#similar-project)
 * [Contributing](#contributing)
+* [Support](#support)
 * [License](#license)
 
 ## Prerequisites
@@ -131,7 +133,7 @@ To install docker, follow the instructions for your platform:
 
 ```bash
 cd base && docker build \
-  --build-arg JULIA_VERSION=1.9.4 \
+  --build-arg JULIA_VERSION=1.10.0 \
   -t jupyterlab/julia/base \
   -f latest.Dockerfile .
 ```
@@ -231,7 +233,8 @@ podman run -it --rm \
   -e NB_USER=root \
   -e NB_UID=0 \
   -e NB_GID=0 \
-  IMAGE[:MAJOR[.MINOR[.PATCH]]] start-notebook.sh --allow-root
+  -e NOTEBOOK_ARGS="--allow-root" \
+  IMAGE[:MAJOR[.MINOR[.PATCH]]]
 ```
 
 #### Using Docker Desktop
@@ -289,6 +292,26 @@ PRs accepted.
 This project follows the
 [Contributor Covenant](https://www.contributor-covenant.org)
 [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## Support
+
+For commercial support, please contact b-data by email: <support@b-data.ch>.
+
+b-data tailors the JupyterLab images to your needs, e.g.
+
+* Integration of self-signed CA certificates to enable communication with web
+  services on the intranet.
+* Setting up the necessary environment variables so that everything works
+  behind a corporate proxy server.
+
+Additionally, the
+[JupyterHub](https://github.com/b-data/docker-deployment-jupyter) setup can be
+customised to allow
+
+* authentication with AD/LDAP
+* mounting CIFS/SMB file shares
+
+and much more.
 
 ## License
 
