@@ -133,7 +133,7 @@ To install docker, follow the instructions for your platform:
 
 ```bash
 cd base && docker build \
-  --build-arg JULIA_VERSION=1.10.0 \
+  --build-arg JULIA_VERSION=1.10.1 \
   -t jupyterlab/julia/base \
   -f latest.Dockerfile .
 ```
