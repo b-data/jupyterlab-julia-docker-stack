@@ -34,43 +34,41 @@ if [ "$(id -u)" == 0 ] ; then
   fi
 
   ## Create user's projects and workspaces folder
-  su "$NB_USER" -c "mkdir -p /home/$NB_USER${DOMAIN:+@$DOMAIN}/projects"
-  su "$NB_USER" -c "mkdir -p /home/$NB_USER${DOMAIN:+@$DOMAIN}/workspaces"
+  run_user_group mkdir -p "/home/$NB_USER${DOMAIN:+@$DOMAIN}/projects"
+  run_user_group mkdir -p "/home/$NB_USER${DOMAIN:+@$DOMAIN}/workspaces"
 
   ## Create default environment folder for Julia
-  su "$NB_USER" -c "mkdir -p /home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/environments/v${JULIA_VERSION%.*}"
+  run_user_group mkdir -p "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/environments/v${JULIA_VERSION%.*}"
 
   # Install user-specific startup files for Julia and IJulia
-  su "$NB_USER" -c "mkdir -p /home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/config"
+  run_user_group mkdir -p "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/config"
   if [[ ! -f "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/config/startup_ijulia.jl" ]]; then
-    su "$NB_USER" -c "cp ${CP_OPTS:--a} /var/backups/skel/.julia/config/startup_ijulia.jl \
-      /home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/config/startup_ijulia.jl"
-    chown :"$NB_GID" "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/config/startup_ijulia.jl"
+    run_user_group cp -a --no-preserve=ownership /var/backups/skel/.julia/config/startup_ijulia.jl \
+      "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/config/startup_ijulia.jl"
   fi
   if [[ ! -f "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/config/startup.jl" ]]; then
-    su "$NB_USER" -c "cp ${CP_OPTS:--a} /var/backups/skel/.julia/config/startup.jl \
-      /home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/config/startup.jl"
-    chown :"$NB_GID" "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/config/startup.jl"
+    run_user_group cp -a --no-preserve=ownership /var/backups/skel/.julia/config/startup.jl \
+      "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.julia/config/startup.jl"
   fi
 
   CS_USD="/home/$NB_USER${DOMAIN:+@$DOMAIN}/.local/share/code-server/User"
   # Install code-server settings
-  su "$NB_USER" -c "mkdir -p $CS_USD"
+  run_user_group mkdir -p "$CS_USD"
   if [[ ! -f "$CS_USD/settings.json" ]]; then
-    su "$NB_USER" -c "cp ${CP_OPTS:--a} /var/backups/skel/.local/share/code-server/User/settings.json \
-      $CS_USD/settings.json"
-    chown :"$NB_GID" "$CS_USD/settings.json"
+    run_user_group cp -a --no-preserve=ownership \
+      /var/backups/skel/.local/share/code-server/User/settings.json \
+      "$CS_USD/settings.json"
   fi
   # Update code-server settings
-  su "$NB_USER" -c "mv $CS_USD/settings.json $CS_USD/settings.json.bak"
-  su "$NB_USER" -c "sed -i ':a;N;\$!ba;s/,\n\}/\n}/g' $CS_USD/settings.json.bak"
+  run_user_group mv "$CS_USD/settings.json" "$CS_USD/settings.json.bak"
+  run_user_group sed -i ':a;N;$!ba;s/,\n\}/\n}/g' "$CS_USD/settings.json.bak"
   if [[ $(jq . "$CS_USD/settings.json.bak" 2> /dev/null) ]]; then
-    su "$NB_USER" -c "jq -s '.[0] * .[1]' \
+    run_user_group jq -s '.[0] * .[1]' \
       /var/backups/skel/.local/share/code-server/User/settings.json \
-      $CS_USD/settings.json.bak > \
-      $CS_USD/settings.json"
+      "$CS_USD/settings.json.bak" > \
+      "$CS_USD/settings.json"
   else
-    su "$NB_USER" -c "mv $CS_USD/settings.json.bak $CS_USD/settings.json"
+    run_user_group mv "$CS_USD/settings.json.bak" "$CS_USD/settings.json"
   fi
 
   # Remove old .zcompdump files
