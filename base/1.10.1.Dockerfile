@@ -292,7 +292,8 @@ RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
   ## SymbolServer: Change permissions on store folder
   && s3f=$(ls $JULIA_DEPOT_PATH/packages/SymbolServer) \
   && cd ${JULIA_DEPOT_PATH}/packages/SymbolServer/${s3f} \
-  && chmod 777 store \
+  && chown -R root:${NB_GID} store \
+  && chmod -R g+w store \
   && unset JULIA_DEPOT_PATH \
   ## Install code-server extension
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension julialang.language-julia \
