@@ -133,7 +133,7 @@ To install docker, follow the instructions for your platform:
 
 ```bash
 cd base && docker build \
-  --build-arg JULIA_VERSION=1.10.0 \
+  --build-arg JULIA_VERSION=1.10.1 \
   -t jupyterlab/julia/base \
   -f latest.Dockerfile .
 ```
@@ -159,14 +159,11 @@ docker run --rm \
 ```
 
 It will be *bind mounted* as the JupyterLab user's home directory and
-automatically populated on first run.
+automatically populated.  
+:exclamation: *Bind mounting* a subfolder of the home directory is only possible
+for images with Julia version ≥ 1.10.1.
 
 ### Run container
-
-| :exclamation: Always mount the user's **entire** home directory.<br>Mounting a subfolder prevents the container from starting.[^1] |
-|:-----------------------------------------------------------------------------------------------------------------------------------|
-
-[^1]: The only exception is the use case described at [Jupyter Docker Stacks > Quick Start > Example 2](https://github.com/jupyter/docker-stacks#quick-start).
 
 self built:
 
@@ -260,10 +257,10 @@ docker run -it --rm \
 
 | Extension                       | Environment variable                                                                                                                                                |
 |:--------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| GitHub Pull Requests and Issues | `GITHUB_TOKEN`: Personal access token with scopes `repo` and `user`.[^2]                                                                                            |
+| GitHub Pull Requests and Issues | `GITHUB_TOKEN`: Personal access token with scopes `repo` and `user`.[^1]                                                                                            |
 | GitLab Workflow                 | `GITLAB_WORKFLOW_INSTANCE_URL`: GitLab instance URL (e.g. https://gitlab.com).<br>`GITLAB_WORKFLOW_TOKEN`: Personal access token with scopes `api` and `read_user`. |
 
-[^2]: *Device activation* may require a one-time login from the extension's sidebar.
+[^1]: *Device activation* may require a one-time login from the extension's sidebar.
 
 ## Similar project
 

@@ -7,10 +7,10 @@ ARG CUDA_IMAGE_FLAVOR
 ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG JUPYTERHUB_VERSION=4.0.2
-ARG JUPYTERLAB_VERSION=4.1.1
+ARG JUPYTERLAB_VERSION=4.1.2
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.21.1
-ARG GIT_VERSION=2.43.1
+ARG CODE_SERVER_VERSION=4.21.2
+ARG GIT_VERSION=2.44.0
 ARG GIT_LFS_VERSION=3.4.1
 ARG PANDOC_VERSION=3.1.11
 
@@ -184,6 +184,11 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   fi \
   ## Add user
   && useradd -l -m -s $(which zsh) -N -u ${NB_UID} ${NB_USER} \
+  ## Mark home directory as populated
+  && touch /home/${NB_USER}/.populated \
+  && chown ${NB_UID}:${NB_GID} /home/${NB_USER}/.populated \
+  && chmod go+w /home/${NB_USER}/.populated \
+  ## Create backup directory for home directory
   && mkdir -p /var/backups/skel \
   && chown ${NB_UID}:${NB_GID} /var/backups/skel \
   ## Install Tini
@@ -248,6 +253,9 @@ RUN export PIP_BREAK_SYSTEM_PACKAGES=1 \
     nbclassic \
     nbconvert \
     python-lsp-server[all] \
+  ## Fix https://github.com/jupyterhub/jupyter-server-proxy/issues/445
+  && sed -i 's/subprotocols=self\.subprotocols/subprotocols=self\.subprotocols if self\.subprotocols else None/g' \
+    /usr/local/lib/python*/*-packages/jupyter_server_proxy/handlers.py \
   ## Include custom fonts
   && sed -i 's|</head>|<link rel="preload" href="{{page_config.fullStaticUrl}}/assets/fonts/MesloLGS-NF-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
   && sed -i 's|</head>|<link rel="preload" href="{{page_config.fullStaticUrl}}/assets/fonts/MesloLGS-NF-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
@@ -319,6 +327,8 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
   && echo "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh" >> ${HOME}/.zshrc \
   ## Create user's private bin
   && mkdir -p ${HOME}/.local/bin \
+  ## Record population timestamp
+  && date -uIseconds > ${HOME}/.populated \
   ## Create backup of home directory
   && cp -a ${HOME}/. /var/backups/skel
 
