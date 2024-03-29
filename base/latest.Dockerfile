@@ -34,6 +34,7 @@ COPY conf/user /files
 COPY scripts /files
 
 RUN mkdir -p "/files/etc/skel/.julia/environments/v${JULIA_VERSION%.*}" \
+  ## Copy content of skel directory to backup
   && cp -a /files/etc/skel/. /files/var/backups/skel \
   && chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
   ## Copy custom fonts
@@ -42,6 +43,15 @@ RUN mkdir -p "/files/etc/skel/.julia/environments/v${JULIA_VERSION%.*}" \
     /files/usr/local/share/jupyter/lab/static/assets \
   && cp -a /files/opt/code-server/src/browser/media/fonts \
     /files/usr/local/share/jupyter/lab/static/assets \
+  && if [ -n "${CUDA_VERSION}" ]; then \
+    ## Use entrypoint of CUDA image
+    mv /opt/nvidia/entrypoint.d /opt/nvidia/nvidia_entrypoint.sh \
+      /files/usr/local/bin; \
+    mv /files/usr/local/bin/start.sh \
+      /files/usr/local/bin/entrypoint.d/99-start.sh; \
+    mv /files/usr/local/bin/nvidia_entrypoint.sh \
+      /files/usr/local/bin/start.sh; \
+  fi \
   ## Ensure file modes are correct when using CI
   ## Otherwise set to 777 in the target image
   && find /files -type d -exec chmod 755 {} \; \
@@ -54,7 +64,10 @@ FROM glcr.b-data.ch/git-lfs/glfsi:${GIT_LFS_VERSION} as glfsi
 
 FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR}
 
-LABEL org.opencontainers.image.licenses="MIT" \
+ARG CUDA_IMAGE_LICENSE
+ARG IMAGE_LICENSE=${CUDA_IMAGE_LICENSE:-MIT}
+
+LABEL org.opencontainers.image.licenses="$IMAGE_LICENSE" \
       org.opencontainers.image.source="https://gitlab.b-data.ch/jupyterlab/julia/docker-stack" \
       org.opencontainers.image.vendor="b-data GmbH" \
       org.opencontainers.image.authors="Olivier Benz <olivier.benz@b-data.ch>"
