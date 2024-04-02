@@ -64,14 +64,6 @@ FROM glcr.b-data.ch/git-lfs/glfsi:${GIT_LFS_VERSION} as glfsi
 
 FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR}
 
-ARG CUDA_IMAGE_LICENSE
-ARG IMAGE_LICENSE=${CUDA_IMAGE_LICENSE:-MIT}
-
-LABEL org.opencontainers.image.licenses="$IMAGE_LICENSE" \
-      org.opencontainers.image.source="https://gitlab.b-data.ch/jupyterlab/julia/docker-stack" \
-      org.opencontainers.image.vendor="b-data GmbH" \
-      org.opencontainers.image.authors="Olivier Benz <olivier.benz@b-data.ch>"
-
 ARG DEBIAN_FRONTEND=noninteractive
 
 ARG BUILD_ON_IMAGE
@@ -90,6 +82,14 @@ ARG BUILD_START
 ARG JULIA_CUDA_PACKAGE_VERSION
 
 ARG CODE_WORKDIR
+
+ARG CUDA_IMAGE_LICENSE=${CUDA_VERSION:+"NVIDIA Deep Learning Container License"}
+ARG IMAGE_LICENSE=${CUDA_IMAGE_LICENSE:-"MIT"}
+
+LABEL org.opencontainers.image.licenses="$IMAGE_LICENSE" \
+      org.opencontainers.image.source="https://gitlab.b-data.ch/jupyterlab/julia/docker-stack" \
+      org.opencontainers.image.vendor="b-data GmbH" \
+      org.opencontainers.image.authors="Olivier Benz <olivier.benz@b-data.ch>"
 
 ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} \
     NB_USER=${NB_USER} \
