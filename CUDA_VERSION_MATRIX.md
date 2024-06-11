@@ -30,11 +30,22 @@ Topmost entry = Tag `latest`
 
 ## Recommended NVIDIA driver
 
-| CUDA   | NVIDIA Linux driver | NVIDIA Windows driver[^3] |
-|:-------|:--------------------|:--------------------------|
-| 12.5.0 | ≥ 555.42.02         | ≥ 555.85                  |
-| 12.4.1 | ≥ 550.54.15         | ≥ 551.78                  |
-| 11.8.0 | ≥ 520.61.05         | ≥ 520.06                  |
+| CUDA   | Linux driver version | Windows driver version[^3] |
+|:-------|:---------------------|:---------------------------|
+| 12.5.0 | ≥ 555.42.02          | ≥ 555.85                   |
+| 12.4.1 | ≥ 550.54.15          | ≥ 551.78                   |
+| 11.8.0 | ≥ 520.61.05          | ≥ 520.06                   |
 
 [^3]: [GPU support in Docker Desktop | Docker Docs](https://docs.docker.com/desktop/gpu/),
 [Nvidia GPU Support for Windows · Issue #19005 · containers/podman](https://github.com/containers/podman/issues/19005)
+
+## Supported NVIDIA drivers
+
+| CUDA   | Driver version 535[^4] | Driver version 470[^5] |
+|:-------|:----------------------:|:----------------------:|
+| 12.5.0 | 🟢                      | 🟢                      |
+| 12.4.1 | 🟢                      | 🟢                      |
+| 11.8.0 | 🔴                      | 🟢                      |
+
+[^4] EOL: June 2026  
+[^5] EOL: July 2024
