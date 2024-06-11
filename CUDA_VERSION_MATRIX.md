@@ -47,5 +47,5 @@ Topmost entry = Tag `latest`
 | 12.4.1 | 🟢                      | 🟢                      |
 | 11.8.0 | 🔴                      | 🟢                      |
 
-[^4] EOL: June 2026  
-[^5] EOL: July 2024
+[^4]: EOL: June 2026  
+[^5]: EOL: July 2024
