@@ -29,7 +29,8 @@ Topmost entry = Tag `latest`
 [^2]: Installs its own CUDA binaries  
 [^3]: The expected TensorRT version is symlinked to the installed TensorRT
 version.  
-❗️ This relies on backwards compatibility of TensorRT, which may not always be the case.
+❗️ This relies on backwards compatibility of TensorRT, which may not always be
+given.
 
 ## Recommended NVIDIA driver (Regular)
 
@@ -40,7 +41,7 @@ version.
 | 12.4.1 | ≥ 550.54.15          | ≥ 551.78                   |
 | 11.8.0 | ≥ 520.61.05          | ≥ 520.06                   |
 
-[^4]: [GPU support in Docker Desktop | Docker Docs](https://docs.docker.com/desktop/gpu/),
+[^4]: [GPU support in Docker Desktop | Docker Docs](https://docs.docker.com/desktop/gpu/)  
 [Nvidia GPU Support for Windows · Issue #19005 · containers/podman](https://github.com/containers/podman/issues/19005)
 
 ## Supported NVIDIA drivers (LTSB)
