@@ -30,6 +30,7 @@ COPY conf/julia/JULIA_PATH /files/${JULIA_PATH}
 COPY conf/jupyter /files
 COPY conf/jupyterlab /files
 COPY conf/shell /files
+COPY conf${CUDA_IMAGE:+/cuda}/shell /files
 COPY conf/user /files
 COPY scripts /files
 
