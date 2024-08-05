@@ -46,6 +46,10 @@ given.
 
 ## Supported NVIDIA drivers (LTSB)
 
+Only works with
+[NVIDIA Data Center GPUs](https://resources.nvidia.com/l/en-us-gpu) or
+[select NGC-Ready NVIDIA RTX boards](https://docs.nvidia.com/certification-programs/ngc-ready-systems/index.html).
+
 | CUDA   | Driver version 535[^5] | Driver version 470[^6] |
 |:-------|:----------------------:|:----------------------:|
 | 12.5.1 | 🟢                      | 🟢                      |
