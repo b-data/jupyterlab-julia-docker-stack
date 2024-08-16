@@ -12,6 +12,7 @@ ARG BUILD_ON_IMAGE
 ARG CODE_BUILTIN_EXTENSIONS_DIR
 ARG QUARTO_VERSION
 ARG CTAN_REPO
+ARG CTAN_REPO_BUILD_LATEST
 ARG BUILD_START
 
 USER root
@@ -64,6 +65,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && ln -rs /opt/TinyTeX/bin/$(uname -m)-linux \
     /opt/TinyTeX/bin/linux \
   && /opt/TinyTeX/bin/linux/tlmgr path add \
+  && tlmgr option repository ${CTAN_REPO_BUILD_LATEST:-$CTAN_REPO} \
   && tlmgr update --self \
   ## TeX packages as requested by the community
   && curl -sSLO https://yihui.org/gh/tinytex/tools/pkgs-yihui.txt \
@@ -82,6 +84,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     oberdiek \
     titling \
   && tlmgr path add \
+  && tlmgr option repository ${CTAN_REPO} \
   && chown -R root:${NB_GID} /opt/TinyTeX \
   && chmod -R g+w /opt/TinyTeX \
   && chmod -R g+wx /opt/TinyTeX/bin \
