@@ -67,6 +67,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && /opt/TinyTeX/bin/linux/tlmgr path add \
   && tlmgr option repository ${CTAN_REPO_BUILD_LATEST:-$CTAN_REPO} \
   && tlmgr update --self \
+  && tlmgr option repository ${CTAN_REPO_BUILD_LATEST:-$CTAN_REPO} \
   ## TeX packages as requested by the community
   && curl -sSLO https://yihui.org/gh/tinytex/tools/pkgs-yihui.txt \
   && tlmgr install $(cat pkgs-yihui.txt | tr '\n' ' ') \
