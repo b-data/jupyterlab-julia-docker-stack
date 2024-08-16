@@ -19,7 +19,6 @@ USER root
 
 ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${JULIA_VERSION} \
     QUARTO_VERSION=${QUARTO_VERSION} \
-    CTAN_REPO=${CTAN_REPO} \
     BUILD_DATE=${BUILD_START}
 
 ENV HOME=/root \
@@ -57,6 +56,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && apt-get -y purge equivs \
   && apt-get -y autoremove \
   ## Admin-based install of TinyTeX
+  && CTAN_REPO=${CTAN_REPO_BUILD_LATEST:-$CTAN_REPO} \
+  && export CTAN_REPO \
   && wget -qO- "https://yihui.org/tinytex/install-unx.sh" \
     | sh -s - --admin --no-path \
   && mv ${HOME}/.TinyTeX /opt/TinyTeX \
@@ -107,6 +108,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
 
 ## Switch back to ${NB_USER} to avoid accidental container runs as root
 USER ${NB_USER}
+
+ENV CTAN_REPO=${CTAN_REPO}
 
 ENV HOME=/home/${NB_USER}
 
