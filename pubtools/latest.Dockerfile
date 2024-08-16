@@ -56,6 +56,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && apt-get -y purge equivs \
   && apt-get -y autoremove \
   ## Admin-based install of TinyTeX
+  && CTAN_REPO_ORIG=${CTAN_REPO} \
   && CTAN_REPO=${CTAN_REPO_BUILD_LATEST:-$CTAN_REPO} \
   && export CTAN_REPO \
   && wget -qO- "https://yihui.org/tinytex/install-unx.sh" \
@@ -66,9 +67,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && ln -rs /opt/TinyTeX/bin/$(uname -m)-linux \
     /opt/TinyTeX/bin/linux \
   && /opt/TinyTeX/bin/linux/tlmgr path add \
-  && tlmgr option repository ${CTAN_REPO_BUILD_LATEST:-$CTAN_REPO} \
   && tlmgr update --self \
-  && tlmgr option repository ${CTAN_REPO_BUILD_LATEST:-$CTAN_REPO} \
   ## TeX packages as requested by the community
   && curl -sSLO https://yihui.org/gh/tinytex/tools/pkgs-yihui.txt \
   && tlmgr install $(cat pkgs-yihui.txt | tr '\n' ' ') \
@@ -86,7 +85,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     oberdiek \
     titling \
   && tlmgr path add \
-  && tlmgr option repository ${CTAN_REPO} \
+  && tlmgr option repository ${CTAN_REPO_ORIG} \
   && chown -R root:${NB_GID} /opt/TinyTeX \
   && chmod -R g+w /opt/TinyTeX \
   && chmod -R g+wx /opt/TinyTeX/bin \
