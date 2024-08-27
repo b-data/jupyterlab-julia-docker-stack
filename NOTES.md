@@ -18,12 +18,13 @@ these images are tweaked as follows:
 
 The following startup scripts are put in place:
 
-* [$JULIA_PATH/etc/julia/startup.jl](base/conf/julia/etc/julia/startup.jl) to add the
+* [$JULIA_PATH/etc/julia/startup.jl](base/conf/julia/JULIA_PATH/etc/julia/startup.jl)
+  to add the
   `LOAD_PATH` of the pre-installed packages
-* [~/.julia/config/startup.jl](base/conf/user/var/backups/skel/.julia/config/startup.jl)
+* [~/.julia/config/startup.jl](base/conf/julia/etc/skel/.julia/config/startup.jl)
   to start [Revise](https://github.com/timholy/Revise.jl) and activate either
   the project environment or package directory.
-* [~/.julia/config/startup_ijulia.jl](base/conf/user/var/backups/skel/.julia/config/startup_ijulia.jl)
+* [~/.julia/config/startup_ijulia.jl](base/conf/julia/etc/skel/.julia/config/startup_ijulia.jl)
   to register MIME type `application/pdf` to IJulia.
 
 ### Jupyter startup scripts
