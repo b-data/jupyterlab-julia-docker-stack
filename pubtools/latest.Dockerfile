@@ -1,7 +1,7 @@
 ARG BUILD_ON_IMAGE=glcr.b-data.ch/jupyterlab/julia/base
 ARG JULIA_VERSION
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG QUARTO_VERSION=1.4.555
+ARG QUARTO_VERSION=1.5.56
 ARG CTAN_REPO=https://mirror.ctan.org/systems/texlive/tlnet
 
 FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}
@@ -12,13 +12,13 @@ ARG BUILD_ON_IMAGE
 ARG CODE_BUILTIN_EXTENSIONS_DIR
 ARG QUARTO_VERSION
 ARG CTAN_REPO
+ARG CTAN_REPO_BUILD_LATEST
 ARG BUILD_START
 
 USER root
 
 ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${JULIA_VERSION} \
     QUARTO_VERSION=${QUARTO_VERSION} \
-    CTAN_REPO=${CTAN_REPO} \
     BUILD_DATE=${BUILD_START}
 
 ENV HOME=/root \
@@ -56,6 +56,9 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && apt-get -y purge equivs \
   && apt-get -y autoremove \
   ## Admin-based install of TinyTeX
+  && CTAN_REPO_ORIG=${CTAN_REPO} \
+  && CTAN_REPO=${CTAN_REPO_BUILD_LATEST:-$CTAN_REPO} \
+  && export CTAN_REPO \
   && wget -qO- "https://yihui.org/tinytex/install-unx.sh" \
     | sh -s - --admin --no-path \
   && mv ${HOME}/.TinyTeX /opt/TinyTeX \
@@ -82,6 +85,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     oberdiek \
     titling \
   && tlmgr path add \
+  && tlmgr option repository ${CTAN_REPO_ORIG} \
   && chown -R root:${NB_GID} /opt/TinyTeX \
   && chmod -R g+w /opt/TinyTeX \
   && chmod -R g+wx /opt/TinyTeX/bin \
@@ -91,10 +95,9 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && fc-cache -fsv \
   ## Install code-server extensions
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension quarto.quarto \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop@9.20.1 \
   ## Update default PATH settings in /etc/profile.d/00-reset-path.sh
-  && sed -i 's|/opt/code-server/bin:$JULIA_PATH/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin|/opt/TinyTeX/bin/linux:/opt/quarto/bin:/opt/code-server/bin:$JULIA_PATH/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin|g' /etc/profile.d/00-reset-path.sh \
-  && sed -i 's|/opt/code-server/bin:$JULIA_PATH/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games|/opt/TinyTeX/bin/linux:/opt/quarto/bin:/opt/code-server/bin:$JULIA_PATH/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games|g' /etc/profile.d/00-reset-path.sh \
+  && sed -i 's|/opt/code-server/bin|/opt/TinyTeX/bin/linux:/opt/quarto/bin:/opt/code-server/bin|g' /etc/profile.d/00-reset-path.sh \
   ## Clean up
   && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/* \
@@ -104,6 +107,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
 
 ## Switch back to ${NB_USER} to avoid accidental container runs as root
 USER ${NB_USER}
+
+ENV CTAN_REPO=${CTAN_REPO}
 
 ENV HOME=/home/${NB_USER}
 

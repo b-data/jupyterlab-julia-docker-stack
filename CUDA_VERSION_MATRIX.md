@@ -4,6 +4,7 @@ Topmost entry = Tag `latest`
 
 | Julia  | Python  | CUDA   | cuBLAS    | cuDNN     | NCCL   | TensorRT  | Linux distro |
 |:-------|:--------|:-------|:----------|:----------|:-------|:----------|:-------------|
+| 1.10.4 | 3.12.5  | 12.6.0 | 12.6.0.22 | 8.9.7.29  | 2.22.3 | 10.3.0.26 | Ubuntu 22.04 |
 | 1.10.3 | 3.12.3  | 12.5.0 | 12.5.2.13 | 8.9.7.29  | 2.21.5 | 10.0.1.6  | Ubuntu 22.04 |
 | 1.10.2 | 3.12.3  | 12.4.1 | 12.4.5.8  | 8.9.7.29  | 2.21.5 | 10.0.1.6  | Ubuntu 22.04 |
 | 1.10.1 | 3.11.8  | 11.8.0 | 11.11.3.6 | 8.9.6.50  | 2.15.5 | 8.5.3[^1] | Ubuntu 22.04 |
@@ -19,21 +20,46 @@ Topmost entry = Tag `latest`
 
 ## PyTorch/TensorFlow compatibility
 
-| Python | CUDA | PyTorch[^2]   | TensorFlow            |
+| Python | CUDA | PyTorch[^2]   | TensorFlow[^3]        |
 |:-------|:-----|:--------------|:----------------------|
+| 3.12   | 12.6 | 2.2 ≤ version | 2.16 ≤ version        |
 | 3.12   | 12.5 | 2.2 ≤ version | 2.16 ≤ version        |
 | 3.12   | 12.4 | 2.2 ≤ version | 2.16 ≤ version        |
 | 3.11   | 11.8 | 2.0 ≤ version | 2.12 ≤ version < 2.15 |
 
-[^2]: Installs its own CUDA binaries
+[^2]: Installs its own CUDA binaries  
+[^3]: The expected TensorRT version is symlinked to the installed TensorRT
+version.  
+❗️ This relies on backwards compatibility of TensorRT, which may not always be
+given.
 
-## Recommended NVIDIA driver
+## Recommended NVIDIA driver (Regular)
 
-| CUDA   | NVIDIA Linux driver | NVIDIA Windows driver[^3] |
-|:-------|:--------------------|:--------------------------|
-| 12.5.0 | ≥ 555.42.02         | ≥ 555.85                  |
-| 12.4.1 | ≥ 550.54.15         | ≥ 551.78                  |
-| 11.8.0 | ≥ 520.61.05         | ≥ 520.06                  |
+| CUDA   | Linux driver version | Windows driver version[^4] |
+|:-------|:---------------------|:---------------------------|
+| 12.6.0 | ≥ 560.28.03          | ≥ 560.76                   |
+| 12.5.0 | ≥ 555.42.02          | ≥ 555.85                   |
+| 12.4.1 | ≥ 550.54.15          | ≥ 551.78                   |
+| 11.8.0 | ≥ 520.61.05          | ≥ 520.06                   |
 
-[^3]: [GPU support in Docker Desktop | Docker Docs](https://docs.docker.com/desktop/gpu/),
+[^4]: [GPU support in Docker Desktop | Docker Docs](https://docs.docker.com/desktop/gpu/)  
 [Nvidia GPU Support for Windows · Issue #19005 · containers/podman](https://github.com/containers/podman/issues/19005)
+
+## Supported NVIDIA drivers (LTSB)
+
+Only works with
+[NVIDIA Data Center GPUs](https://resources.nvidia.com/l/en-us-gpu) or
+[select NGC-Ready NVIDIA RTX boards](https://docs.nvidia.com/certification-programs/ngc-ready-systems/index.html).
+
+| CUDA   | Driver version 535[^5] | Driver version 470[^6] |
+|:-------|:----------------------:|:----------------------:|
+| 12.6.0 | 🟢                      | 🟢                      |
+| 12.5.0 | 🟢                      | 🟢                      |
+| 12.4.1 | 🟢                      | 🟢                      |
+| 11.8.0 | 🟡                      | 🟢                      |
+
+🟢: Works due to the CUDA forward compat package  
+🟡: Supported due to backward compatibility
+
+[^5]: EOL: June 2026  
+[^6]: EOL: July 2024

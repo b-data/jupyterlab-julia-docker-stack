@@ -6,15 +6,15 @@ ARG CUDA_IMAGE_FLAVOR
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
-ARG JUPYTERHUB_VERSION=5.0.0
-ARG JUPYTERLAB_VERSION=4.2.1
+ARG JUPYTERHUB_VERSION=5.1.0
+ARG JUPYTERLAB_VERSION=4.2.5
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.89.1
-ARG GIT_VERSION=2.45.2
+ARG CODE_SERVER_VERSION=4.92.2
+ARG GIT_VERSION=2.46.0
 ARG GIT_LFS_VERSION=3.5.1
-ARG PANDOC_VERSION=3.1.11
+ARG PANDOC_VERSION=3.2
 
-ARG JULIA_CUDA_PACKAGE_VERSION=5.4.2
+ARG JULIA_CUDA_PACKAGE_VERSION=5.4.3
 
 FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} as files
 
@@ -30,6 +30,7 @@ COPY conf/julia/JULIA_PATH /files/${JULIA_PATH}
 COPY conf/jupyter /files
 COPY conf/jupyterlab /files
 COPY conf/shell /files
+COPY conf${CUDA_IMAGE:+/cuda}/shell /files
 COPY conf/user /files
 COPY scripts /files
 
@@ -196,8 +197,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && dpkg -i pandoc-${PANDOC_VERSION}-1-${dpkgArch}.deb \
   && rm pandoc-${PANDOC_VERSION}-1-${dpkgArch}.deb \
   ## Delete potential user with UID 1000
-  && if $(grep -q 1000 /etc/passwd); then \
-    userdel $(id -un 1000); \
+  && if grep -q 1000 /etc/passwd; then \
+    userdel --remove $(id -un 1000); \
   fi \
   ## Do not set user limits for sudo/sudo-i
   && sed -i 's/.*pam_limits.so/#&/g' /etc/pam.d/sudo \
