@@ -1,5 +1,7 @@
 # CUDA Version Matrix
 
+Image tags = Julia versions
+
 Topmost entry = Tag `latest`
 
 | Julia  | Python  | CUDA   | cuBLAS    | cuDNN     | NCCL   | TensorRT  | Linux distro |
