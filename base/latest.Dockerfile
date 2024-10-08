@@ -6,15 +6,16 @@ ARG CUDA_IMAGE_FLAVOR
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
-ARG JUPYTERHUB_VERSION=5.1.0
+ARG JUPYTERHUB_VERSION=5.2.0
 ARG JUPYTERLAB_VERSION=4.2.5
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.92.2
-ARG GIT_VERSION=2.46.0
+ARG CODE_SERVER_VERSION=4.93.1
+ARG NEOVIM_VERSION=0.10.2
+ARG GIT_VERSION=2.46.2
 ARG GIT_LFS_VERSION=3.5.1
 ARG PANDOC_VERSION=3.2
 
-ARG JULIA_CUDA_PACKAGE_VERSION=5.4.3
+ARG JULIA_CUDA_PACKAGE_VERSION=5.5.2
 
 FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} as files
 
@@ -60,6 +61,7 @@ RUN mkdir -p "/files/etc/skel/.julia/environments/v${JULIA_VERSION%.*}" \
   && find /files/usr/local/bin -type f -exec chmod 755 {} \; \
   && find /files/etc/profile.d -type f -exec chmod 755 {} \;
 
+FROM glcr.b-data.ch/neovim/nvsi:${NEOVIM_VERSION} AS nvsi
 FROM glcr.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} as gsi
 FROM glcr.b-data.ch/git-lfs/glfsi:${GIT_LFS_VERSION} as glfsi
 
@@ -75,6 +77,7 @@ ARG JUPYTERHUB_VERSION
 ARG JUPYTERLAB_VERSION
 ARG CODE_BUILTIN_EXTENSIONS_DIR
 ARG CODE_SERVER_VERSION
+ARG NEOVIM_VERSION
 ARG GIT_VERSION
 ARG GIT_LFS_VERSION
 ARG PANDOC_VERSION
@@ -101,6 +104,7 @@ ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA
     JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION} \
     JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION} \
     CODE_SERVER_VERSION=${CODE_SERVER_VERSION} \
+    NEOVIM_VERSION=${NEOVIM_VERSION} \
     GIT_VERSION=${GIT_VERSION} \
     GIT_LFS_VERSION=${GIT_LFS_VERSION} \
     PANDOC_VERSION=${PANDOC_VERSION} \
@@ -108,6 +112,8 @@ ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA
 
 ENV NB_GID=100
 
+## Install Neovim
+COPY --from=nvsi /usr/local /usr/local
 ## Install Git
 COPY --from=gsi /usr/local /usr/local
 ## Install Git LFS
@@ -147,6 +153,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     vim-tiny \
     wget \
     zsh \
+    ## Neovim: Additional runtime recommendations
+    ripgrep \
     ## Git: Additional runtime dependencies
     libcurl3-gnutls \
     liberror-perl \
@@ -172,12 +180,10 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     done; \
   else \
     ## Force update pip, setuptools and wheel
-    curl -sLO https://bootstrap.pypa.io/get-pip.py; \
-    python get-pip.py \
+    pip install --upgrade --force-reinstall \
       pip \
       setuptools \
       wheel; \
-    rm get-pip.py; \
   fi \
   ## Install font MesloLGS NF
   && mkdir -p /usr/share/fonts/truetype/meslo \

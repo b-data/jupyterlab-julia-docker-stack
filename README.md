@@ -35,6 +35,7 @@ base → pubtools
   * **Git LFS**: A Git extension for versioning large files.
   * **Julia**: A high-level, high-performance dynamic language for technical
     computing.
+  * **Neovim**: Vim-fork focused on extensibility and usability. (1.10.5+)
   * **Pandoc**: A universal markup converter.
   * **Python**: An interpreted, object-oriented, high-level programming language
     with dynamic semantics.
@@ -134,7 +135,7 @@ To install docker, follow the instructions for your platform:
 
 ```bash
 cd base && docker build \
-  --build-arg JULIA_VERSION=1.10.4 \
+  --build-arg JULIA_VERSION=1.10.5 \
   -t jupyterlab/julia/base \
   -f latest.Dockerfile .
 ```

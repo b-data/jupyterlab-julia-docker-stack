@@ -1,7 +1,7 @@
 ARG BUILD_ON_IMAGE=glcr.b-data.ch/jupyterlab/julia/base
 ARG JULIA_VERSION
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG QUARTO_VERSION=1.5.56
+ARG QUARTO_VERSION=1.5.57
 ARG CTAN_REPO=https://mirror.ctan.org/systems/texlive/tlnet
 
 FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}
@@ -95,7 +95,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && fc-cache -fsv \
   ## Install code-server extensions
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension quarto.quarto \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop@9.20.1 \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop \
   ## Update default PATH settings in /etc/profile.d/00-reset-path.sh
   && sed -i 's|/opt/code-server/bin|/opt/TinyTeX/bin/linux:/opt/quarto/bin:/opt/code-server/bin|g' /etc/profile.d/00-reset-path.sh \
   ## Clean up
