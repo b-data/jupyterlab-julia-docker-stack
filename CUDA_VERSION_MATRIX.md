@@ -69,7 +69,7 @@ Only works with
 | 11.8.0 | 🟡                      | 🟢                      |
 
 🔵: Supported due to the CUDA forward compat package  
-🟢: Supported due to minor-version compatibility
+🟢: Supported due to minor-version compatibility  
 🟡: Supported due to backward compatibility
 
 [^6]: EOL: June 2026  
