@@ -6,8 +6,9 @@ Topmost entry = Tag `latest`
 
 | Julia  | Python  | CUDA   | cuBLAS    | cuDNN     | NCCL   | TensorRT[^1]            | Linux distro |
 |:-------|:--------|:-------|:----------|:----------|:-------|:------------------------|:-------------|
-| 1.11.0 | 3.12.7  | 12.6.2 | 12.6.1.4  | 8.9.7.29  | 2.23.4 | 10.5.0.18/<br>10.3.0.26 | Ubuntu 22.04 |
+| 1.11.1 | 3.12.7  | 12.6.2 | 12.6.3.3  | 8.9.7.29  | 2.23.4 | 10.5.0.18/<br>10.3.0.26 | Ubuntu 22.04 |
 | 1.10.5 | 3.12.7  | 12.6.1 | 12.6.1.4  | 8.9.7.29  | 2.23.4 | 10.5.0.18/<br>10.3.0.26 | Ubuntu 22.04 |
+| 1.11.0 | 3.12.7  | 12.6.2 | 12.6.1.4  | 8.9.7.29  | 2.23.4 | 10.5.0.18/<br>10.3.0.26 | Ubuntu 22.04 |
 | 1.10.4 | 3.12.5  | 12.6.0 | 12.6.0.22 | 8.9.7.29  | 2.22.3 | 10.3.0.26               | Ubuntu 22.04 |
 | 1.10.3 | 3.12.3  | 12.5.0 | 12.5.2.13 | 8.9.7.29  | 2.21.5 | 10.0.1.6                | Ubuntu 22.04 |
 | 1.10.2 | 3.12.3  | 12.4.1 | 12.4.5.8  | 8.9.7.29  | 2.21.5 | 10.0.1.6                | Ubuntu 22.04 |
@@ -27,10 +28,10 @@ Topmost entry = Tag `latest`
 
 | Python | CUDA | PyTorch[^3]   | TensorFlow[^4]        |
 |:-------|:-----|:--------------|:----------------------|
-| 3.12   | 12.6 | 2.2 ≤ version | 2.16 ≤ version        |
-| 3.12   | 12.5 | 2.2 ≤ version | 2.16 ≤ version        |
-| 3.12   | 12.4 | 2.2 ≤ version | 2.16 ≤ version        |
-| 3.11   | 11.8 | 2.0 ≤ version | 2.12 ≤ version < 2.15 |
+| 3.12   | 12.6 | version ≥ 2.2 | version ≥ 2.16        |
+| 3.12   | 12.5 | version ≥ 2.2 | version ≥ 2.16        |
+| 3.12   | 12.4 | version ≥ 2.2 | version ≥ 2.16        |
+| 3.11   | 11.8 | version ≥ 2.0 | 2.15 ≥ version > 2.12 |
 
 [^3]: Installs its own CUDA binaries  
 [^4]: The expected TensorRT version is symlinked to the installed TensorRT
@@ -60,14 +61,15 @@ Only works with
 
 | CUDA   | Driver version 535[^6] | Driver version 470[^7] |
 |:-------|:----------------------:|:----------------------:|
-| 12.6.2 | 🟢                      | 🟢                      |
-| 12.6.1 | 🟢                      | 🟢                      |
-| 12.6.0 | 🟢                      | 🟢                      |
-| 12.5.0 | 🟢                      | 🟢                      |
-| 12.4.1 | 🟢                      | 🟢                      |
+| 12.6.2 | 🟢                      | 🔵                      |
+| 12.6.1 | 🟢                      | 🔵                      |
+| 12.6.0 | 🟢                      | 🔵                      |
+| 12.5.0 | 🟢                      | 🔵                      |
+| 12.4.1 | 🟢                      | 🔵                      |
 | 11.8.0 | 🟡                      | 🟢                      |
 
-🟢: Works due to the CUDA forward compat package  
+🔵: Supported due to the CUDA forward compat package  
+🟢: Supported due to minor-version compatibility  
 🟡: Supported due to backward compatibility
 
 [^6]: EOL: June 2026  

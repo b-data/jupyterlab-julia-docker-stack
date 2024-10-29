@@ -8,7 +8,7 @@
 Multi-arch (`linux/amd64`, `linux/arm64/v8`) docker images:
 
 * [`glcr.b-data.ch/jupyterlab/julia/base`](https://gitlab.b-data.ch/jupyterlab/julia/base/container_registry)
-  * [`glcr.b-data.ch/jupyterlab/julia/ver`](https://gitlab.b-data.ch/jupyterlab/julia/ver/container_registry) (1.5.4 ≤ version < 1.7.3)
+  * [`glcr.b-data.ch/jupyterlab/julia/ver`](https://gitlab.b-data.ch/jupyterlab/julia/ver/container_registry) (1.7.3 ≥ version > 1.5.4)
 * [`glcr.b-data.ch/jupyterlab/julia/pubtools`](https://gitlab.b-data.ch/jupyterlab/julia/pubtools/container_registry)
 
 Images considered stable for Julia versions ≥ 1.7.3.  
@@ -135,7 +135,7 @@ To install docker, follow the instructions for your platform:
 
 ```bash
 cd base && docker build \
-  --build-arg JULIA_VERSION=1.11.0 \
+  --build-arg JULIA_VERSION=1.11.1 \
   -t jupyterlab/julia/base \
   -f latest.Dockerfile .
 ```
