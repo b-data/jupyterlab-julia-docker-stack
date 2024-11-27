@@ -1,8 +1,8 @@
 ARG BUILD_ON_IMAGE=glcr.b-data.ch/jupyterlab/julia/base
 ARG JULIA_VERSION=1.10.6
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG QUARTO_VERSION=1.5.57
-ARG CTAN_REPO=https://mirror.ctan.org/systems/texlive/tlnet
+ARG QUARTO_VERSION=1.6.37
+ARG CTAN_REPO=https://www.texlive.info/tlnet-archive/2024/11/26/tlnet
 
 FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}
 
