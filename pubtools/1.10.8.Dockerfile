@@ -1,8 +1,8 @@
 ARG BUILD_ON_IMAGE=glcr.b-data.ch/jupyterlab/julia/base
 ARG JULIA_VERSION=1.10.8
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG QUARTO_VERSION=1.6.40
-ARG CTAN_REPO=https://mirror.ctan.org/systems/texlive/tlnet
+ARG QUARTO_VERSION=1.6.42
+ARG CTAN_REPO=https://www.texlive.info/tlnet-archive/2025/03/10/tlnet
 
 FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}
 
@@ -42,7 +42,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && tar -xzf quarto-${QUARTO_VERSION}-linux-${dpkgArch}.tar.gz -C /opt/quarto --no-same-owner --strip-components=1 \
   && rm quarto-${QUARTO_VERSION}-linux-${dpkgArch}.tar.gz \
   ## Exempt quarto from address space limit
-  && sed -i 's/"${QUARTO_DENO}"/prlimit -v=unlimited: "${QUARTO_DENO}"/g' \
+  && sed -i 's/"${QUARTO_DENO}"/prlimit --as=unlimited: "${QUARTO_DENO}"/g' \
     /opt/quarto/bin/quarto \
   ## Remove quarto pandoc
   && rm /opt/quarto/bin/tools/$(uname -m)/pandoc \
