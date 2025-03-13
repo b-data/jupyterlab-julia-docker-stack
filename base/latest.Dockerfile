@@ -7,10 +7,10 @@ ARG CUDA_IMAGE_FLAVOR
 ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG JUPYTERHUB_VERSION=5.2.1
-ARG JUPYTERLAB_VERSION=4.3.4
+ARG JUPYTERLAB_VERSION=4.3.5
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.96.4
-ARG NEOVIM_VERSION=0.10.3
+ARG CODE_SERVER_VERSION=4.98.0
+ARG NEOVIM_VERSION=0.10.4
 ARG GIT_VERSION=2.48.1
 ARG GIT_LFS_VERSION=3.6.1
 ARG PANDOC_VERSION=3.4
@@ -260,8 +260,11 @@ RUN mkdir /opt/code-server \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension mhutchie.git-graph \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension editorconfig.editorconfig \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension editorconfig.editorconfig@0.16.6 \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension DavidAnson.vscode-markdownlint \
+  ## Fix permissions for Python Debugger extension
+  && chown :${NB_GID} /opt/code-server/lib/vscode/extensions/ms-python.debugpy-* \
+  && chmod g+w /opt/code-server/lib/vscode/extensions/ms-python.debugpy-* \
   ## Create folders temp and tmp for Jupyter extension
   && cd /opt/code-server/lib/vscode/extensions/ms-toolsai.jupyter-* \
   && mkdir -m 1777 temp \
@@ -376,7 +379,10 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
 COPY --from=files /files /
 COPY --from=files /files/var/backups/skel ${HOME}
 
-EXPOSE 8888
+ARG JUPYTER_PORT=8888
+ENV JUPYTER_PORT=${JUPYTER_PORT}
+
+EXPOSE $JUPYTER_PORT
 
 ## Configure container startup
 ENTRYPOINT ["tini", "-g", "--", "start.sh"]
