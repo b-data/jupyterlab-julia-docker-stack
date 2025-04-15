@@ -7,15 +7,15 @@ ARG CUDA_IMAGE_FLAVOR
 ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG JUPYTERHUB_VERSION=5.2.1
-ARG JUPYTERLAB_VERSION=4.3.5
+ARG JUPYTERLAB_VERSION=4.4.0
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.98.0
-ARG NEOVIM_VERSION=0.10.4
-ARG GIT_VERSION=2.48.1
+ARG CODE_SERVER_VERSION=4.99.2
+ARG NEOVIM_VERSION=0.11.0
+ARG GIT_VERSION=2.49.0
 ARG GIT_LFS_VERSION=3.6.1
 ARG PANDOC_VERSION=3.4
 
-ARG JULIA_CUDA_PACKAGE_VERSION=5.6.1
+ARG JULIA_CUDA_PACKAGE_VERSION=5.7.2
 
 FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} as files
 
@@ -235,6 +235,9 @@ ENV PATH=/opt/code-server/bin:$PATH \
 RUN mkdir /opt/code-server \
   && cd /opt/code-server \
   && curl -sL https://github.com/coder/code-server/releases/download/v${CODE_SERVER_VERSION}/code-server-${CODE_SERVER_VERSION}-linux-$(dpkg --print-architecture).tar.gz | tar zxf - --no-same-owner --strip-components=1 \
+  ## Exempt code-server from address space limit
+  && sed -i 's/exec/exec prlimit --as=unlimited:/g' \
+    /opt/code-server/bin/code-server \
   ## Copy custom fonts
   && mkdir -p /opt/code-server/src/browser/media/fonts \
   && cp -a /usr/share/fonts/truetype/meslo/*.ttf /opt/code-server/src/browser/media/fonts \
@@ -260,7 +263,7 @@ RUN mkdir /opt/code-server \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension mhutchie.git-graph \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension editorconfig.editorconfig@0.16.6 \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension editorconfig.editorconfig \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension DavidAnson.vscode-markdownlint \
   ## Fix permissions for Python Debugger extension
   && chown :${NB_GID} /opt/code-server/lib/vscode/extensions/ms-python.debugpy-* \

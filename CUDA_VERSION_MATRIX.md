@@ -6,8 +6,9 @@ Topmost entry = Tag `latest`
 
 | Julia  | Python  | CUDA   | cuBLAS    | cuDNN     | NCCL   | TensorRT[^1]            | Linux distro |
 |:-------|:--------|:-------|:----------|:----------|:-------|:------------------------|:-------------|
-| 1.11.3 | 3.12.9  | 12.8.0 | 12.8.3.14 | 8.9.7.29  | 2.25.1 | 10.8.0.43/<br>10.3.0.26 | Ubuntu 22.04 |
+| 1.11.4 | 3.12.10 | 12.8.1 | 12.8.4.1  | 8.9.7.29  | 2.25.1 | 10.9.0.34/<br>10.3.0.26 | Ubuntu 22.04 |
 | 1.10.9 | 3.12.9  | 12.8.0 | 12.8.3.14 | 8.9.7.29  | 2.25.1 | 10.8.0.43/<br>10.3.0.26 | Ubuntu 22.04 |
+| 1.11.3 | 3.12.9  | 12.8.0 | 12.8.3.14 | 8.9.7.29  | 2.25.1 | 10.8.0.43/<br>10.3.0.26 | Ubuntu 22.04 |
 | 1.10.8 | 3.12.9  | 12.8.0 | 12.8.3.14 | 8.9.7.29  | 2.25.1 | 10.8.0.43/<br>10.3.0.26 | Ubuntu 22.04 |
 | 1.10.7 | 3.12.8  | 12.6.3 | 12.6.4.1  | 8.9.7.29  | 2.23.4 | 10.7.0.23/<br>10.3.0.26 | Ubuntu 22.04 |
 | 1.11.2 | 3.12.8  | 12.6.3 | 12.6.4.1  | 8.9.7.29  | 2.23.4 | 10.7.0.23/<br>10.3.0.26 | Ubuntu 22.04 |
@@ -34,11 +35,11 @@ Topmost entry = Tag `latest`
 
 | Python | CUDA | PyTorch[^3]   | TensorFlow[^4]        |
 |:-------|:-----|:--------------|:----------------------|
-| 3.12   | 12.8 | version ≥ 2.2 | version ≥ 2.16        |
-| 3.12   | 12.6 | version ≥ 2.2 | version ≥ 2.16        |
-| 3.12   | 12.5 | version ≥ 2.2 | version ≥ 2.16        |
-| 3.12   | 12.4 | version ≥ 2.2 | version ≥ 2.16        |
-| 3.11   | 11.8 | version ≥ 2.0 | 2.15 ≥ version > 2.11 |
+| 3.12   | 12.8 | version ≥ 2.2 | 2.18 > version ≥ 2.16 |
+| 3.12   | 12.6 | version ≥ 2.2 | 2.18 > version ≥ 2.16 |
+| 3.12   | 12.5 | version ≥ 2.2 | 2.18 > version ≥ 2.16 |
+| 3.12   | 12.4 | version ≥ 2.2 | 2.18 > version ≥ 2.16 |
+| 3.11   | 11.8 | version ≥ 2.0 | 2.16 > version ≥ 2.12 |
 
 [^3]: Installs its own CUDA binaries  
 [^4]: The expected TensorRT version is symlinked to the installed TensorRT
@@ -50,7 +51,8 @@ given.
 
 | CUDA   | Linux driver version | Windows driver version[^5] |
 |:-------|:---------------------|:---------------------------|
-| 12.8.0 | ≥ 570.26             | ≥ 570.65                   |
+| 12.8.1 | ≥ 570.124.06         | ≥ 572.61                   |
+| 12.8.0 | ≥ 570.117            | ≥ 572.30                   |
 | 12.6.3 | ≥ 560.35.05          | ≥ 561.17                   |
 | 12.6.2 | ≥ 560.35.03          | ≥ 560.94                   |
 | 12.6.1 | ≥ 560.35.03          | ≥ 560.94                   |
@@ -70,6 +72,7 @@ Only works with
 
 | CUDA   | Driver version 535[^6] | Driver version 470[^7] |
 |:-------|:----------------------:|:----------------------:|
+| 12.8.1 | 🟢                      | 🔵                      |
 | 12.8.0 | 🟢                      | 🔵                      |
 | 12.6.3 | 🟢                      | 🔵                      |
 | 12.6.2 | 🟢                      | 🔵                      |
@@ -79,9 +82,10 @@ Only works with
 | 12.4.1 | 🟢                      | 🔵                      |
 | 11.8.0 | 🟡                      | 🟢                      |
 
-🔵: Supported due to the CUDA forward compat package  
-🟢: Supported due to minor-version compatibility  
+🔵: Supported with the CUDA forward compat package only  
+🟢: Supported due to minor-version compatibility[^8]  
 🟡: Supported due to backward compatibility
 
 [^6]: EOL: June 2026  
 [^7]: EOL: July 2024
+[^8]: or the CUDA forward compat package
