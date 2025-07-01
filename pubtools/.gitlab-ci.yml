@@ -1,6 +1,6 @@
 .env:
   variables:
-    JULIA_VERSION: "1.11.5"
+    JULIA_VERSION: "1.10.9"
     CTAN_REPO_BUILD_LATEST: "https://mirror.init7.net/ctan/systems/texlive/tlnet"
     TAG_VERSION_MAJ_MIN: "false"
     TAG_VERSION_MAJ: "false"
