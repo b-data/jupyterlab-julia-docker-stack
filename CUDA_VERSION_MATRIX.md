@@ -6,7 +6,7 @@ Topmost entry = Tag `latest`
 
 | Julia   | Python  | CUDA   | cuBLAS    | cuDNN     | NCCL   | TensorRT[^1]             | Linux distro |
 |:--------|:--------|:-------|:----------|:----------|:-------|:-------------------------|:-------------|
-| 1.11.6  | 3.12.11 | 13.0.0 | 13.0.0.19 | 9.12.0.46 | 2.27.7 | n/a                      | Ubuntu 24.04 |
+| 1.11.6  | 3.13.7  | 13.0.0 | 13.0.0.19 | 9.12.0.46 | 2.27.7 | n/a                      | Ubuntu 24.04 |
 | 1.10.10 | 3.12.11 | 12.9.1 | 12.9.1.4  | 8.9.7.29  | 2.27.3 | 10.12.0.36/<br>10.3.0.26 | Ubuntu 22.04 |
 | 1.11.5  | 3.12.11 | 12.9.1 | 12.9.1.4  | 8.9.7.29  | 2.27.3 | 10.12.0.36/<br>10.3.0.26 | Ubuntu 22.04 |
 | 1.10.9  | 3.12.11 | 12.9.1 | 12.9.1.4  | 8.9.7.29  | 2.27.3 | 10.12.0.36/<br>10.3.0.26 | Ubuntu 22.04 |
@@ -36,14 +36,15 @@ Topmost entry = Tag `latest`
 
 ## PyTorch/TensorFlow compatibility
 
-| Python | CUDA | PyTorch[^3]   | TensorFlow[^4]        |
-|:-------|:-----|:--------------|:----------------------|
-| 3.12   | 13.0 | version ≥ 2.4 | n/a                   |
-| 3.12   | 12.8 | version ≥ 2.4 | 2.18 > version ≥ 2.16 |
-| 3.12   | 12.6 | version ≥ 2.4 | 2.18 > version ≥ 2.16 |
-| 3.12   | 12.5 | version ≥ 2.4 | 2.18 > version ≥ 2.16 |
-| 3.12   | 12.4 | version ≥ 2.4 | 2.18 > version ≥ 2.16 |
-| 3.11   | 11.8 | version ≥ 2.0 | 2.16 > version ≥ 2.12 |
+| Python | CUDA | PyTorch[^3]                  | TensorFlow[^4]        |
+|:-------|:-----|:-----------------------------|:----------------------|
+| 3.13   | 13.0 | version ≥ 2.5 (experimental) | n/a                   |
+| 3.12   | 12.9 | version ≥ 2.4                | 2.18 > version ≥ 2.16 |
+| 3.12   | 12.8 | version ≥ 2.4                | 2.18 > version ≥ 2.16 |
+| 3.12   | 12.6 | version ≥ 2.4                | 2.18 > version ≥ 2.16 |
+| 3.12   | 12.5 | version ≥ 2.4                | 2.18 > version ≥ 2.16 |
+| 3.12   | 12.4 | version ≥ 2.4                | 2.18 > version ≥ 2.16 |
+| 3.11   | 11.8 | version ≥ 2.0                | 2.16 > version ≥ 2.12 |
 
 [^3]: Installs its own CUDA dependencies  
 [^4]: The expected TensorRT version is symlinked to the installed TensorRT
