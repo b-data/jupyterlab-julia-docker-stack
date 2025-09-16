@@ -1,7 +1,7 @@
 ARG BUILD_ON_IMAGE=glcr.b-data.ch/jupyterlab/julia/base
 ARG JULIA_VERSION
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG QUARTO_VERSION=1.7.32
+ARG QUARTO_VERSION=1.8.24
 ARG CTAN_REPO=https://mirror.ctan.org/systems/texlive/tlnet
 
 FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}
@@ -52,7 +52,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   ## by building a dummy package using equivs
   && apt-get install -y --no-install-recommends equivs \
   && cd /tmp \
-  && wget https://github.com/scottkosty/install-tl-ubuntu/raw/master/debian-control-texlive-in.txt \
+  && wget https://raw.githubusercontent.com/scottkosty/install-tl-ubuntu/master/debian-control-texlive-in.txt \
   && equivs-build debian-* \
   && mv texlive-local*.deb texlive-local.deb \
   && dpkg -i texlive-local.deb \
