@@ -6,10 +6,6 @@
 
 workflow:
   rules:
-    - if: $CI_COMMIT_BRANCH == "main" && $CUDA_BASE_IMAGE == "ubuntu"
-      variables:
-        BASE_IMAGE: "$CUDA_BASE_IMAGE"
-        BASE_IMAGE_TAG: "$CUDA_BASE_IMAGE_TAG"
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $CUDA_BASE_IMAGE == null && $JULIA_VERSION =~ /1.10/
       variables:
         BASE_IMAGE_TAG: "12"
@@ -17,6 +13,10 @@ workflow:
       variables:
         BASE_IMAGE: "$CUDA_BASE_IMAGE"
         BASE_IMAGE_TAG: "22.04"
+    - if: $CUDA_BASE_IMAGE == "ubuntu"
+      variables:
+        BASE_IMAGE: "$CUDA_BASE_IMAGE"
+        BASE_IMAGE_TAG: "$CUDA_BASE_IMAGE_TAG"
     - if: $CI_COMMIT_BRANCH
 
 .before-script-build: &before-script-build
