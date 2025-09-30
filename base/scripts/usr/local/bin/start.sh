@@ -322,7 +322,7 @@ else
             _log "- home dir: /var/tmp/home/$(id -un)"
 
             # Create and populate the new user's home directory
-            mkdir -p "/var/tmp/home"
+            mkdir -p "/var/tmp/home/$(id -un)"
             if [[ ! -f "/var/tmp/home/$(id -un)/.populated" ]]; then
                 # Create list of missing files (top level only)
                 fd="$(comm -13 <(cd  "/var/tmp/home/$(id -un)"; ls -A) <(cd /var/backups/skel; ls -A) \
