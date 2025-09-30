@@ -322,13 +322,27 @@ else
             _log "- home dir: /var/tmp/home/$(id -un)"
 
             # Create and populate the new user's home directory
-            _log "Attempting to copy /var/backups/skel to /var/tmp/home/$(id -un)..."
-            mkdir "/var/tmp/home"
-            if eval "cp -r /var/backups/skel /var/tmp/home/$(id -un)"; then
-                _log "Success!"
-            else
-                _log "ERROR: Failed to copy data from /var/backups/skel to /var/tmp/home/$(id -un)!"
-                exit 1
+            mkdir -p "/var/tmp/home"
+            if [[ ! -f "/var/tmp/home/$(id -un)/.populated" ]]; then
+                # Create list of missing files (top level only)
+                fd="$(comm -13 <(cd  "/var/tmp/home/$(id -un)"; ls -A) <(cd /var/backups/skel; ls -A) \
+                    | paste -sd ',' -)"
+                # Handle case when only marker is missing
+                if [[ "${fd}" == ".populated" ]]; then
+                    sf="${fd}"
+                else
+                    sf="{${fd}}"
+                fi
+                _log "Populating home dir: /var/tmp/home/$(id -un)"
+                _log "Copying files/directories (recursively):"
+                _log "- ${fd}"
+                if eval "cp -r /var/backups/skel/${sf} /var/tmp/home/$(id -un)"; then
+                    date -uIseconds > "/var/tmp/home/$(id -un)/.populated"
+                    _log "Done populating home dir"
+                else
+                    _log "ERROR: Failed to copy data from /var/backups/skel to /var/tmp/home/$(id -un)!"
+                    exit 1
+                fi
             fi
             HOME="/var/tmp/home/$(id -un)"
             export HOME
