@@ -7,15 +7,15 @@ ARG CUDA_IMAGE_FLAVOR
 ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG JUPYTERHUB_VERSION=5.3.0
-ARG JUPYTERLAB_VERSION=4.4.5
+ARG JUPYTERLAB_VERSION=4.4.9
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.104.0
+ARG CODE_SERVER_VERSION=4.104.2
 ARG NEOVIM_VERSION=0.11.4
 ARG GIT_VERSION=2.51.0
 ARG GIT_LFS_VERSION=3.7.0
 ARG PANDOC_VERSION=3.6.3
 
-ARG JULIA_CUDA_PACKAGE_VERSION=5.8.3
+ARG JULIA_CUDA_PACKAGE_VERSION=5.9.0
 
 FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} as files
 
@@ -212,7 +212,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     sed -i 's/.*pam_limits.so/#&/g' /etc/pam.d/sudo-i; \
   fi \
   ## Add user
-  && useradd -l -m -s $(which zsh) -N -u ${NB_UID} ${NB_USER} \
+  && useradd -K HOME_MODE=0755 -l -m -s $(which zsh) -N -u ${NB_UID} ${NB_USER} \
   ## Mark home directory as populated
   && touch /home/${NB_USER}/.populated \
   && chown ${NB_UID}:${NB_GID} /home/${NB_USER}/.populated \
@@ -220,6 +220,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   ## Create backup directory for home directory
   && mkdir -p /var/backups/skel \
   && chown ${NB_UID}:${NB_GID} /var/backups/skel \
+  ## Allow writing to /etc/passwd for the root group
+  && chmod g+w /etc/passwd \
   ## Install Tini
   && curl -sL https://github.com/krallin/tini/releases/download/v0.19.0/tini-${dpkgArch} -o /usr/local/bin/tini \
   && chmod +x /usr/local/bin/tini \
