@@ -43,6 +43,15 @@ Topmost entry = Tag `latest`
 | 1.8.0   | 3.9.2   | 2.3.1       | 3.4.6       | 4.6.1 (1.70.2)     | n/a    | 2.37.2 | 3.2.0   | 2.19.2 | Debian 11    |
 | 1.7.3   | 3.9.2   | 2.3.1       | 3.4.5       | 4.5.2 (1.68.1)     | n/a    | 2.37.2 | 3.2.0   | 2.18   | Debian 11    |
 
+### Bugs
+
+* Versions 1.12.{1,2}: \[vscode-shellcheck/vscode-shellcheck\] ShellCheck is
+  not installed or not working
+  * Cross reference: <https://github.com/vscode-shellcheck/vscode-shellcheck/issues/1708>
+    * Cross reference: <https://github.com/microsoft/vscode/issues/276673>
+* Versions 1.12.{1,2}: \[timholy/Revise.jl\] Precompile directive failing on 1.12.1
+  * Cross reference: <https://github.com/timholy/Revise.jl/issues/969>
+
 ## pubtools images
 
 | Julia   | CTAN date  | Quarto      |
@@ -83,12 +92,3 @@ Topmost entry = Tag `latest`
 | 1.7.3   | 2022‑08‑17 | 1.0.38[^1]  |
 
 [^1]: `amd64` only
-
-### Bugs
-
-* Versions 1.12.{1,2}: \[vscode-shellcheck/vscode-shellcheck\] ShellCheck is
-  not installed or not working
-  * Cross reference: <https://github.com/vscode-shellcheck/vscode-shellcheck/issues/1708>
-    * Cross reference: <https://github.com/microsoft/vscode/issues/276673>
-* Versions 1.12.{1,2}: \[timholy/Revise.jl\] Precompile directive failing on 1.12.1
-  * Cross reference: <https://github.com/timholy/Revise.jl/issues/969>
