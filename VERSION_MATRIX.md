@@ -45,7 +45,7 @@ Topmost entry = Tag `latest`
 
 ### Bugs
 
-* Versions 1.12.{1,2}: \[vscode-shellcheck/vscode-shellcheck\] ShellCheck is
+* Versions 1.12.1: \[vscode-shellcheck/vscode-shellcheck\] ShellCheck is
   not installed or not working
   * Cross reference: <https://github.com/vscode-shellcheck/vscode-shellcheck/issues/1708>
     * Cross reference: <https://github.com/microsoft/vscode/issues/276673>
@@ -56,7 +56,7 @@ Topmost entry = Tag `latest`
 
 | Julia   | CTAN date  | Quarto      |
 |:--------|:-----------|:------------|
-| 1.12.2  |            | 1.8.26      |
+| 1.12.2  | 2025-12-15 | 1.8.26      |
 | 1.10.10 |            | 1.7.32      |
 | 1.12.1  | 2025-11-20 | 1.8.26      |
 | 1.12.0  | 2025-10-17 | 1.8.25      |
