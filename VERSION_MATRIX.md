@@ -49,7 +49,7 @@ Topmost entry = Tag `latest`
   not installed or not working
   * Cross reference: <https://github.com/vscode-shellcheck/vscode-shellcheck/issues/1708>
     * Cross reference: <https://github.com/microsoft/vscode/issues/276673>
-* Versions 1.12.1: \[timholy/Revise.jl\] Precompile directive failing on 1.12.1
+* Versions 1.12.{1,2}: \[timholy/Revise.jl\] Precompile directive failing on 1.12.1
   * Cross reference: <https://github.com/timholy/Revise.jl/issues/969>
 
 ## pubtools images
