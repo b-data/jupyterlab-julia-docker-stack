@@ -8,8 +8,9 @@ Topmost entry = Tag `latest`
 
 | Julia   | Python  | Jupyter Hub | Jupyter Lab | code‑server (Code) | Neovim | Git    | Git LFS | Pandoc | Linux distro |
 |:--------|:--------|:------------|:------------|:-------------------|:-------|:-------|:--------|:-------|:-------------|
-| 1.12.1  | 3.13.9  | 5.4.2       | 4.4.10      | 4.106.2 (1.106.2)  | 0.11.5 | 2.52.0 | 3.7.1   | 3.6.3  | Debian 13    |
+| 1.12.2  | 3.13.11 | 5.4.3       | 4.5.1       | 4.107.0 (1.107.0)  | 0.11.5 | 2.52.0 | 3.7.1   | 3.6.3  | Debian 13    |
 | 1.10.10 | 3.12.11 | 5.3.0       | 4.4.4       | 4.101.2 (1.101.2)  | 0.11.2 | 2.50.0 | 3.7.0   | 3.6.3  | Debian 12    |
+| 1.12.1  | 3.13.9  | 5.4.2       | 4.4.10      | 4.106.2 (1.106.2)  | 0.11.5 | 2.52.0 | 3.7.1   | 3.6.3  | Debian 13    |
 | 1.12.0  | 3.13.9  | 5.4.0       | 4.4.9       | 4.105.0 (1.104.3)  | 0.11.4 | 2.51.1 | 3.7.1   | 3.6.3  | Debian 13    |
 | 1.11.7  | 3.13.8  | 5.3.0       | 4.4.9       | 4.104.3 (1.104.3)  | 0.11.4 | 2.51.0 | 3.7.0   | 3.6.3  | Debian 13    |
 | 1.11.6  | 3.13.7  | 5.3.0       | 4.4.5       | 4.104.0 (1.104.0)  | 0.11.4 | 2.51.0 | 3.7.0   | 3.6.3  | Debian 13    |
@@ -42,12 +43,22 @@ Topmost entry = Tag `latest`
 | 1.8.0   | 3.9.2   | 2.3.1       | 3.4.6       | 4.6.1 (1.70.2)     | n/a    | 2.37.2 | 3.2.0   | 2.19.2 | Debian 11    |
 | 1.7.3   | 3.9.2   | 2.3.1       | 3.4.5       | 4.5.2 (1.68.1)     | n/a    | 2.37.2 | 3.2.0   | 2.18   | Debian 11    |
 
+### Bugs
+
+* Versions 1.12.{1,2}: \[vscode-shellcheck/vscode-shellcheck\] ShellCheck is
+  not installed or not working
+  * Cross reference: <https://github.com/vscode-shellcheck/vscode-shellcheck/issues/1708>
+    * Cross reference: <https://github.com/microsoft/vscode/issues/276673>
+* Versions 1.12.{1,2}: \[timholy/Revise.jl\] Precompile directive failing on 1.12.1
+  * Cross reference: <https://github.com/timholy/Revise.jl/issues/969>
+
 ## pubtools images
 
 | Julia   | CTAN date  | Quarto      |
 |:--------|:-----------|:------------|
-| 1.12.1  | 2025-11-20 | 1.8.26      |
+| 1.12.2  |            | 1.8.26      |
 | 1.10.10 |            | 1.7.32      |
+| 1.12.1  | 2025-11-20 | 1.8.26      |
 | 1.12.0  | 2025-10-17 | 1.8.25      |
 | 1.11.7  | 2025-10-07 | 1.8.25      |
 | 1.11.6  | 2025-09-08 | 1.8.24      |

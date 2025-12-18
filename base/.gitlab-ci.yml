@@ -1,5 +1,5 @@
 variables:
-  JULIA_VERSION: "1.12.1"
+  JULIA_VERSION: "1.12.2"
   TAG_VERSION_MAJ_MIN: "false"
   TAG_VERSION_MAJ: "false"
 
