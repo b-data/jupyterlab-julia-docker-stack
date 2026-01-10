@@ -6,8 +6,9 @@ Topmost entry = Tag `latest`
 
 | Julia   | Python  | CUDA   | cuBLAS    | cuDNN     | NCCL   | TensorRT[^1]             | Linux distro |
 |:--------|:--------|:-------|:----------|:----------|:-------|:-------------------------|:-------------|
-| 1.12.2  | 3.13.11 | 13.1.0 | 13.2.0.9  | 9.17.0.29 | 2.28.9 | n/a                      | Ubuntu 24.04 |
+| 1.12.3  | 3.13.11 | 13.1.0 | 13.2.0.9  | 9.17.1.4  | 2.29.2 | n/a                      | Ubuntu 24.04 |
 | 1.10.10 | 3.12.11 | 12.9.1 | 12.9.1.4  | 8.9.7.29  | 2.27.3 | 10.12.0.36/<br>10.3.0.26 | Ubuntu 22.04 |
+| 1.12.2  | 3.13.11 | 13.1.0 | 13.2.0.9  | 9.17.0.29 | 2.28.9 | n/a                      | Ubuntu 24.04 |
 | 1.12.1  | 3.13.9  | 13.0.2 | 13.1.0.3  | 9.16.0.29 | 2.28.3 | n/a                      | Ubuntu 24.04 |
 | 1.12.0  | 3.13.9  | 13.0.1 | 13.0.2.14 | 9.14.0.64 | 2.28.3 | n/a                      | Ubuntu 24.04 |
 | 1.11.7  | 3.13.8  | 13.0.1 | 13.0.2.14 | 9.13.1.26 | 2.28.3 | n/a                      | Ubuntu 24.04 |
@@ -62,7 +63,7 @@ version.
 ❗️ This relies on backwards compatibility of TensorRT, which may not always be
 given.
 
-## Recommended NVIDIA driver (Regular)
+## Recommended NVIDIA driver (NFB/PB)
 
 | CUDA   | Linux driver version | Windows driver version[^5] |
 |:-------|:---------------------|:---------------------------|
