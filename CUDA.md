@@ -81,7 +81,7 @@ cd base && docker build \
   --build-arg BASE_IMAGE=ubuntu \
   --build-arg BASE_IMAGE_TAG=24.04 \
   --build-arg BUILD_ON_IMAGE=glcr.b-data.ch/cuda/julia/ver \
-  --build-arg JULIA_VERSION=1.12.4 \
+  --build-arg JULIA_VERSION=1.12.5 \
   --build-arg CUDA_IMAGE_FLAVOR=devel \
   -t jupyterlab/cuda/julia/base \
   -f latest.Dockerfile .
