@@ -6,16 +6,16 @@ ARG CUDA_IMAGE_FLAVOR
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
-ARG JUPYTERHUB_VERSION=5.4.3
-ARG JUPYTERLAB_VERSION=4.5.5
+ARG JUPYTERHUB_VERSION=5.4.4
+ARG JUPYTERLAB_VERSION=4.5.6
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.110.0
-ARG NEOVIM_VERSION=0.11.6
+ARG CODE_SERVER_VERSION=4.115.0
+ARG NEOVIM_VERSION=0.12.1
 ARG GIT_VERSION=2.53.0
 ARG GIT_LFS_VERSION=3.7.1
-ARG PANDOC_VERSION=3.6.3
+ARG PANDOC_VERSION=3.8.3
 
-ARG JULIA_CUDA_PACKAGE_VERSION=5.10.1
+ARG JULIA_CUDA_PACKAGE_VERSION=6.0.0
 
 FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} as files
 
@@ -322,8 +322,7 @@ RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
     *) echo "Unknown target processor architecture '${dpkgArch}'" >&2; exit 1 ;; \
   esac \
   ## Install the Julia kernel for Jupyter
-  && julia -e 'using Pkg; Pkg.add(["IJulia", "LanguageServer"]); Pkg.precompile()' \
-  && julia -e 'using Pkg; Pkg.add(Pkg.PackageSpec(;name="Revise", version="3.12.3")); Pkg.precompile()' \
+  && julia -e 'using Pkg; Pkg.add(["IJulia", "Pkg", "Revise", "LanguageServer"]); Pkg.precompile()' \
   && mv ${HOME}/.local/share/jupyter/kernels/julia* /usr/local/share/jupyter/kernels/ \
   ## Install CUDA
   && if [ ! -z "$CUDA_IMAGE" ]; then \

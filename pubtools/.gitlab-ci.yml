@@ -1,7 +1,7 @@
 variables:
-  JULIA_VERSION: "1.12.5"
+  JULIA_VERSION: "1.10.11"
   CTAN_REPO_BUILD_LATEST: "https://mirror.init7.net/ctan/systems/texlive/tlnet"
-  TAG_VERSION_MAJ_MIN: "false"
+  TAG_VERSION_MAJ_MIN: "true"
   TAG_VERSION_MAJ: "false"
 
 .before-script-build: &before-script-build
@@ -16,6 +16,10 @@ variables:
       export CI_APP_TAG=${CI_APP_TAG:-$JULIA_VERSION}
     else
       export CI_APP_TAG=${CI_APP_TAG:-$CI_COMMIT_SHA}
+    fi
+  - |
+    if [[ "$TAG_VERSION_MAJ_MIN" == "true" ]]; then
+      export CTAN_REPO_RELEASE_LTS="https://mirror.init7.net/ctan/systems/texlive/tlnet"
     fi
   - >
     echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER
@@ -148,6 +152,7 @@ build:version-linux-amd64:
     - >
       docker build --pull
       --build-arg BUILD_ON_IMAGE
+      --build-arg CTAN_REPO_BUILD_LATEST=$CTAN_REPO_RELEASE_LTS
       --build-arg BUILD_START=$(date -uIseconds)
       -t $CI_APP_REPO:$CI_APP_TAG-linux-amd64
       -f pubtools/$JULIA_VERSION.Dockerfile .
@@ -185,6 +190,7 @@ build:version-linux-arm64v8:
     - >
       docker build --pull
       --build-arg BUILD_ON_IMAGE
+      --build-arg CTAN_REPO_BUILD_LATEST=CTAN_REPO_RELEASE_LTS
       --build-arg BUILD_START=$(date -uIseconds)
       -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
       -f pubtools/$JULIA_VERSION.Dockerfile .
