@@ -190,7 +190,7 @@ build:version-linux-arm64v8:
     - >
       docker build --pull
       --build-arg BUILD_ON_IMAGE
-      --build-arg CTAN_REPO_BUILD_LATEST=CTAN_REPO_RELEASE_LTS
+      --build-arg CTAN_REPO_BUILD_LATEST=$CTAN_REPO_RELEASE_LTS
       --build-arg BUILD_START=$(date -uIseconds)
       -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
       -f pubtools/$JULIA_VERSION.Dockerfile .
