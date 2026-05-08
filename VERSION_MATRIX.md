@@ -8,7 +8,7 @@ Topmost entry = Tag `latest`
 
 | Julia   | Python  | Jupyter Hub | Jupyter Lab | code‑server (Code) | Neovim | Git    | Git LFS | Pandoc | Linux distro |
 |:--------|:--------|:------------|:------------|:-------------------|:-------|:-------|:--------|:-------|:-------------|
-| 1.12.6  | 3.14.4  | 5.4.4       | 4.5.7       | 4.117.0 (1.117.0)  | 0.12.2 | 2.54.0 | 3.7.1   | 3.8.3  | Debian 13    |
+| 1.12.6  | 3.14.4  | 5.4.4       | 4.5.7       | 4.118.0 (1.118.0)  | 0.12.2 | 2.54.0 | 3.7.1   | 3.8.3  | Debian 13    |
 | 1.11.9  | 3.13.11 | 5.4.4       | 4.5.6       | 4.115.0 (1.115.0)  | 0.12.1 | 2.53.0 | 3.7.1   | 3.8.3  | Debian 13    |
 | 1.10.11 | 3.12.13 | 5.4.4       | 4.5.6       | 4.115.0 (1.115.0)  | 0.12.1 | 2.53.0 | 3.7.1   | 3.8.3  | Debian 12    |
 | 1.12.5  | 3.13.11 | 5.4.4       | 4.5.6       | 4.115.0 (1.115.0)  | 0.12.1 | 2.53.0 | 3.7.1   | 3.8.3  | Debian 13    |
@@ -51,12 +51,12 @@ Topmost entry = Tag `latest`
 
 ### Bugs
 
+* Versions 1.12.{1,2}: \[timholy/Revise.jl\] Precompile directive failing on 1.12.1
+  * Cross reference: <https://github.com/timholy/Revise.jl/issues/969>
 * Versions 1.12.1: \[vscode-shellcheck/vscode-shellcheck\] ShellCheck is
   not installed or not working
   * Cross reference: <https://github.com/vscode-shellcheck/vscode-shellcheck/issues/1708>
     * Cross reference: <https://github.com/microsoft/vscode/issues/276673>
-* Versions 1.12.{1,2}: \[timholy/Revise.jl\] Precompile directive failing on 1.12.1
-  * Cross reference: <https://github.com/timholy/Revise.jl/issues/969>
 
 ## pubtools images
 
