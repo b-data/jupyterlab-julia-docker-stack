@@ -21,7 +21,6 @@ if !isempty(get(ENV, "CUDA_VERSION", ""))
         try 
             @assert CUDA.functional(true)
             println("CUDA functional")
-            println("CUDA may invalidate Revise: https://github.com/timholy/Revise.jl/issues/746")
         catch e
             @warn "Error initializing CUDA" exception=(e, catch_backtrace())
         end
