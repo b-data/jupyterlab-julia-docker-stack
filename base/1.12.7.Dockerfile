@@ -323,7 +323,8 @@ RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
     *) echo "Unknown target processor architecture '${dpkgArch}'" >&2; exit 1 ;; \
   esac \
   ## Install the Julia kernel for Jupyter
-  && julia -e 'using Pkg; Pkg.add(["IJulia", "Pkg", "Revise", "LanguageServer"]); Pkg.precompile()' \
+  && julia -e 'using Pkg; Pkg.add(["IJulia", "Pkg", "Revise"]); Pkg.precompile()' \
+  && julia -e 'using Pkg; Pkg.add(name="LanguageServer", version = "5.0.0"); Pkg.precompile()' \
   && mv ${HOME}/.local/share/jupyter/kernels/julia* /usr/local/share/jupyter/kernels/ \
   ## Install CUDA
   && if [ ! -z "$CUDA_IMAGE" ]; then \
