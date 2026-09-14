@@ -20,11 +20,6 @@ https://demo.jupyter.b-data.ch.
 
 ![Screenshot](assets/screenshot.png)
 
-Due to ongoing DDoS attacks, access to b-data's IT infrastructure has been
-blocked for all Chinese servers.  
-:information_source: For any requests to unblock individual Chinese IPs or CIDR
-blocks, please contact <olivier.benz@b-data.ch>.
-
 **Build chain**
 
 base → pubtools
@@ -140,7 +135,7 @@ To install docker, follow the instructions for your platform:
 
 ```bash
 cd base && docker build \
-  --build-arg JULIA_VERSION=1.12.6 \
+  --build-arg JULIA_VERSION=1.12.7 \
   -t jupyterlab/julia/base \
   -f latest.Dockerfile .
 ```
