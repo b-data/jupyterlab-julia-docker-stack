@@ -7,15 +7,15 @@ ARG CUDA_IMAGE_FLAVOR
 ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG JUPYTERHUB_VERSION=5.5.1
-ARG JUPYTERLAB_VERSION=4.6.3
+ARG JUPYTERLAB_VERSION=4.6.4
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.136.2
+ARG CODE_SERVER_VERSION=4.138.0
 ARG NEOVIM_VERSION=0.12.5
 ARG GIT_VERSION=2.55.0
 ARG GIT_LFS_VERSION=3.8.0
 ARG PANDOC_VERSION=3.10
 
-ARG JULIA_CUDA_PACKAGE_VERSION=6.3.1
+ARG JULIA_CUDA_PACKAGE_VERSION=6.4.0
 
 FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} as files
 
@@ -319,7 +319,7 @@ RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
   && dpkgArch="$(dpkg --print-architecture)" \
   && case "${dpkgArch}" in \
     amd64) export JULIA_CPU_TARGET="generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1);x86-64-v4,-rdrnd,base(1)" ;; \
-    arm64) export JULIA_CPU_TARGET="generic;cortex-a57;thunderx2t99;carmel,clone_all;apple-m1,base(3);neoverse-512tvb,base(3)" ;; \
+    arm64) export JULIA_CPU_TARGET="generic;cortex-a57;thunderx2t99;carmel,clone_all;apple-m1,base(3);neoverse-512tvb,-rand,-fpac,base(3)" ;; \
     *) echo "Unknown target processor architecture '${dpkgArch}'" >&2; exit 1 ;; \
   esac \
   ## Install the Julia kernel for Jupyter
@@ -332,14 +332,11 @@ RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
     julia -e 'using CUDA; CUDA.precompile_runtime()'; \
   fi \
   ## Make installed packages available system-wide
+  && find ${JULIA_DEPOT_PATH} -name CACHEDIR.TAG -exec rm {} \; \
+  && rm -rf ${JULIA_DEPOT_PATH}/packages/temp \
   && julia -e 'using Pkg; Pkg.add(readdir("$(ENV["JULIA_DEPOT_PATH"])/packages"))' \
   && rm -rf ${JULIA_DEPOT_PATH}/registries/* \
   && chmod -R ugo+rx ${JULIA_DEPOT_PATH} \
-  ## SymbolServer: Change permissions on store folder
-  && s3f=$(ls $JULIA_DEPOT_PATH/packages/SymbolServer) \
-  && cd ${JULIA_DEPOT_PATH}/packages/SymbolServer/${s3f} \
-  && chown -R root:${NB_GID} store \
-  && chmod -R g+w store \
   && unset JULIA_DEPOT_PATH \
   ## Install code-server extension
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension julialang.language-julia \
