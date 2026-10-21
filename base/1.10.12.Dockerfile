@@ -6,16 +6,16 @@ ARG CUDA_IMAGE_FLAVOR
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
-ARG JUPYTERHUB_VERSION=5.5.1
-ARG JUPYTERLAB_VERSION=4.6.3
+ARG JUPYTERHUB_VERSION=6.1.0
+ARG JUPYTERLAB_VERSION=4.6.4
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.132.0
-ARG NEOVIM_VERSION=0.12.4
+ARG CODE_SERVER_VERSION=4.141.0
+ARG NEOVIM_VERSION=0.12.6
 ARG GIT_VERSION=2.55.0
-ARG GIT_LFS_VERSION=3.7.1
+ARG GIT_LFS_VERSION=3.8.0
 ARG PANDOC_VERSION=3.10
 
-ARG JULIA_CUDA_PACKAGE_VERSION=6.2.1
+ARG JULIA_CUDA_PACKAGE_VERSION=6.4.1
 
 FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} as files
 
@@ -64,8 +64,9 @@ RUN mkdir -p "/files/etc/skel/.julia/environments/v${JULIA_VERSION%.*}" \
 FROM glcr.b-data.ch/neovim/nvsi:${NEOVIM_VERSION} AS nvsi
 FROM glcr.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} as gsi
 FROM glcr.b-data.ch/git-lfs/glfsi:${GIT_LFS_VERSION} as glfsi
+FROM glcr.b-data.ch/vscode-extensions/ms-python.python:latest-python-env-tools AS pet
 
-FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR}
+FROM ${BUILD_ON_IMAGE}:${JULIA_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} AS jupyterlab-julia-base
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -322,7 +323,8 @@ RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
     *) echo "Unknown target processor architecture '${dpkgArch}'" >&2; exit 1 ;; \
   esac \
   ## Install the Julia kernel for Jupyter
-  && julia -e 'using Pkg; Pkg.add(["IJulia", "Pkg", "Revise", "LanguageServer"]); Pkg.precompile()' \
+  && julia -e 'using Pkg; Pkg.add(name="LanguageServer", version="5.0.0"); Pkg.precompile()' \
+  && julia -e 'using Pkg; Pkg.add(["IJulia", "Pkg", "Revise"]); Pkg.precompile()' \
   && mv ${HOME}/.local/share/jupyter/kernels/julia* /usr/local/share/jupyter/kernels/ \
   ## Install CUDA
   && if [ ! -z "$CUDA_IMAGE" ]; then \
@@ -341,7 +343,7 @@ RUN export JULIA_DEPOT_PATH=${JULIA_PATH}/local/share/julia \
   && chmod -R g+w store \
   && unset JULIA_DEPOT_PATH \
   ## Install code-server extension
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension julialang.language-julia \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension julialang.language-julia@1.219.2 \
   ## Clean up
   && rm -rf /tmp/* \
     /var/lib/apt/lists/* \
@@ -379,9 +381,23 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
   ## Create backup of home directory
   && cp -a ${HOME}/. /var/backups/skel
 
+FROM files AS files-pet
+
+COPY --from=jupyterlab-julia-base /opt/code-server/lib/vscode/extensions /tmp/extensions
+COPY --from=pet /python-env-tools /tmp/python-env-tools
+
+## Add missing Python environment tools to Python extension
+RUN extensionBasename="$(basename /tmp/extensions/ms-python.python-*)" \
+  && mkdir -p "/files/opt/code-server/lib/vscode/extensions/$extensionBasename" \
+  && cp -r /tmp/python-env-tools \
+    /files/opt/code-server/lib/vscode/extensions/ms-python.python-*-universal \
+  && rm -rf /tmp/*
+
+FROM jupyterlab-julia-base
+
 ## Copy files as late as possible to avoid cache busting
-COPY --from=files /files /
-COPY --from=files /files/var/backups/skel ${HOME}
+COPY --from=files-pet /files /
+COPY --from=files-pet /files/var/backups/skel ${HOME}
 
 ARG JUPYTER_PORT=8888
 ENV JUPYTER_PORT=${JUPYTER_PORT}
