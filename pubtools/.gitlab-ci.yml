@@ -1,6 +1,6 @@
 variables:
   JULIA_VERSION: "1.10.12"
-  CTAN_REPO_BUILD_LATEST: "https://mirror.init7.net/ctan/systems/texlive/tlnet"
+  CTAN_REPO_BUILD: "https://mirror.init7.net/ctan/systems/texlive/tlnet"
   TAG_VERSION_MAJ_MIN: "true"
   TAG_VERSION_MAJ: "false"
 
@@ -16,10 +16,6 @@ variables:
       export CI_APP_TAG=${CI_APP_TAG:-$JULIA_VERSION}
     else
       export CI_APP_TAG=${CI_APP_TAG:-$CI_COMMIT_SHA}
-    fi
-  - |
-    if [[ "$TAG_VERSION_MAJ_MIN" == "true" ]]; then
-      export CTAN_REPO_RELEASE_LTS="https://mirror.init7.net/ctan/systems/texlive/tlnet"
     fi
   - >
     echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER
@@ -67,7 +63,7 @@ build:latest-linux-amd64:
       docker build --pull
       --build-arg BUILD_ON_IMAGE
       --build-arg JULIA_VERSION
-      --build-arg CTAN_REPO_BUILD_LATEST
+      --build-arg CTAN_REPO_BUILD
       --build-arg BUILD_START=$(date -uIseconds)
       -t $CI_APP_REPO:$CI_APP_TAG-linux-amd64
       -t $CI_APP_REPO:latest-linux-amd64
@@ -110,7 +106,7 @@ build:latest-linux-arm64v8:
       docker build --pull
       --build-arg BUILD_ON_IMAGE
       --build-arg JULIA_VERSION
-      --build-arg CTAN_REPO_BUILD_LATEST
+      --build-arg CTAN_REPO_BUILD
       --build-arg BUILD_START=$(date -uIseconds)
       -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
       -t $CI_APP_REPO:latest-linux-arm64v8
@@ -152,7 +148,7 @@ build:version-linux-amd64:
     - >
       docker build --pull
       --build-arg BUILD_ON_IMAGE
-      --build-arg CTAN_REPO_BUILD_LATEST=$CTAN_REPO_RELEASE_LTS
+      --build-arg CTAN_REPO_BUILD
       --build-arg BUILD_START=$(date -uIseconds)
       -t $CI_APP_REPO:$CI_APP_TAG-linux-amd64
       -f pubtools/$JULIA_VERSION.Dockerfile .
@@ -190,7 +186,7 @@ build:version-linux-arm64v8:
     - >
       docker build --pull
       --build-arg BUILD_ON_IMAGE
-      --build-arg CTAN_REPO_BUILD_LATEST=$CTAN_REPO_RELEASE_LTS
+      --build-arg CTAN_REPO_BUILD
       --build-arg BUILD_START=$(date -uIseconds)
       -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
       -f pubtools/$JULIA_VERSION.Dockerfile .
