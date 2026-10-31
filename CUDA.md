@@ -79,7 +79,7 @@ latest:
 ```bash
 cd base && docker build \
   --build-arg BASE_IMAGE=ubuntu \
-  --build-arg BASE_IMAGE_TAG=24.04 \
+  --build-arg BASE_IMAGE_TAG=26.04 \
   --build-arg BUILD_ON_IMAGE=glcr.b-data.ch/cuda/julia/ver \
   --build-arg JULIA_VERSION=1.13.3 \
   --build-arg CUDA_IMAGE_FLAVOR=devel \
@@ -92,7 +92,7 @@ version:
 ```bash
 cd base && docker build \
   --build-arg BASE_IMAGE=ubuntu \
-  --build-arg BASE_IMAGE_TAG=24.04 \
+  --build-arg BASE_IMAGE_TAG=26.04 \
   --build-arg BUILD_ON_IMAGE=glcr.b-data.ch/cuda/julia/ver \
   --build-arg CUDA_IMAGE_FLAVOR=devel \
   -t jupyterlab/cuda/julia/base:MAJOR.MINOR.PATCH \
@@ -213,7 +213,7 @@ docker run -it --rm \
 **What makes this project different:**
 
 1. Multi-arch: `linux/amd64`, `linux/arm64/v8`
-1. Derived from [`nvidia/cuda:13.4.3-devel-ubuntu24.04`](https://hub.docker.com/r/nvidia/cuda/tags?page=1&name=13.4.3-devel-ubuntu24.04)
+1. Derived from [`nvidia/cuda:13.4.3-devel-ubuntu26.04`](https://hub.docker.com/r/nvidia/cuda/tags?page=1&name=13.4.3-devel-ubuntu26.04)
     * including development libraries and headers
 1. IDE: [code-server](https://github.com/coder/code-server) next to
    [JupyterLab](https://github.com/jupyterlab/jupyterlab)
